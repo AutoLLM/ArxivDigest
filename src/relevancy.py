@@ -40,10 +40,12 @@ def post_process_chat_gpt_response(paper_data, response, threshold_score=8):
     if response is None:
         return []
     json_items = response['message']['content'].replace("\n\n", "\n").split("\n")
-    pattern = r"^\d+\. "
+    pattern = r"^\d+\. |\\"
     import pprint
     try:
-        score_items = [json.loads(re.sub(pattern, "", line)) for line in json_items if "relevancy score" in line.lower()]
+        score_items = [
+            json.loads(re.sub(pattern, "", line))
+            for line in json_items if "relevancy score" in line.lower()]
     except Exception:
         pprint.pprint([re.sub(pattern, "", line) for line in json_items if "relevancy score" in line.lower()])
         raise RuntimeError("failed")
