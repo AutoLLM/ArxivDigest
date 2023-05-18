@@ -1,0 +1,37 @@
+# For physics topics, use the specific subtopics, e.g. "Astrophysics"
+topic: "Computer Science"
+# An empty list here will include all categories in a topic
+# Including more categories will result in more calls to the large language model
+categories: ["Artificial Intelligence", "Computation and Language"]
+
+# The email address that the digest will be sent from. must be the address matching
+# your sendgrid api key.
+# Leaving this empty will cause the script to use the
+# FROM_EMAIL environment variable instead
+from_email: ""
+
+# The email address you are going to send the digest to
+# Leaving this empty will cause the script to use the
+# TO_EMAIL environment variable instead
+to_email: ""
+
+# Relevance score threshold. abstracts that receive a score less than this from the large language model
+# will have their papers filtered out.
+#
+# Must be within 1-10
+threshold: 7
+
+# A natural language statement that the large language model will use to judge which papers are relevant 
+#
+# For example:
+#     "I am interested in complexity theory papers that establish upper bounds"
+#     "gas chromatography, mass spectrometry"
+#     "making lots of money"
+#
+# This can be empty, which just return a full list of papers with no judgement or filtering,
+# in whatever order arXiv responds with.
+interest: |
+  1. Large language model pretraining and finetunings
+  2. Multimodal machine learning
+  3. Do not care about specific application, for example, information extraction, summarization, etc.
+  4. Not interested in paper focus on specific languages, e.g., Arabic, Chinese, etc.
