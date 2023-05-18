@@ -44,7 +44,7 @@ jobs:
         MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
         MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
         MAIL_CONNECTION: ${{ secrets.MAIL_CONNECTION }}
-      if: "${{ env.SENDGRID_API_KEY != '' && (env.MAIL_CONNECTION || env.MAIL_USERNAME != '' && env.MAIL_PASSWORD != '') }}"
+      if: "${{ env.SENDGRID_API_KEY == '' && (env.MAIL_CONNECTION || env.MAIL_USERNAME != '' && env.MAIL_PASSWORD != '') }}"
       run: echo "DEFINED=true" >> $GITHUB_OUTPUT 
     - name: Test step
       env:
