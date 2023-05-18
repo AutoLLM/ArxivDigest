@@ -40,7 +40,7 @@ The recommended way to get started using this repository is to:
 2. Modify `config.yaml` and merge the changes into your main branch. If you want a different schedule than Sunday through Thursday at 1:25PM UTC, then also modify the file `.github/workflows/daily_pipeline.yaml`
 3. Create or fetch your api key for [OpenAI](https://platform.openai.com/account/api-keys). Note: you will need an OpenAI account.
 4. Create or fetch your api key for [SendGrid](https://app.SendGrid.com/settings/api_keys). You will need a SendGrid account. The free tier will generally suffice.
-5. Set the following secrets:
+5. Set the following secrets [(under settings, Secrets and variables, repository secrets)](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository):
    - `OPENAI_API_KEY`
    - `SENDGRID_API_KEY`
    - `FROM_EMAIL` (only if you don't have it set in `config.yaml`)
@@ -58,7 +58,7 @@ An alternative way to get started using this repository is to:
 2. Modify `config.yaml` and merge the changes into your main branch. If you want a different schedule than Sunday through Thursday at 1:25PM UTC, then also modify the file `.github/workflows/daily_pipeline.yaml`
 3. Create or fetch your api key for [OpenAI](https://platform.openai.com/account/api-keys). Note: you will need an OpenAI account.
 4. Find your email provider's SMTP settings and set the secret `MAIL_CONNECTION` to that. It should be in the form `smtp://user:password@server:port` or `smtp+starttls://user:password@server:port`. Alternatively, if you are using Gmail, you can set `MAIL_USERNAME` and `MAIL_PASSWORD` instead, using an [application password](https://support.google.com/accounts/answer/185833).
-5. Set the following secrets:
+5. Set the following secrets [(under settings, Secrets and variables, repository secrets)](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository):
    - `OPENAI_API_KEY`
    - `MAIL_CONNECTION` (see above)
    - `MAIL_PASSWORD` (only if you don't have `MAIL_CONNECTION` set)
@@ -83,7 +83,7 @@ If you do not wish to fork this repository, and would prefer to clone and run it
 2. Modify the configuration file `config.yaml`
 3. Create or fetch your api key for [OpenAI](https://platform.openai.com/account/api-keys). Note: you will need an OpenAI account.
 4. Create or fetch your api key for [SendGrid](https://app.SendGrid.com/settings/api_keys) (optional, if you want the script to email you)
-5. Set the following secrets:
+5. Set the following secrets [(under settings, Secrets and variables, repository secrets)](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository):
    - `OPENAI_API_KEY`
    - `SENDGRID_API_KEY` (only if using SendGrid)
    - `FROM_EMAIL` (only if using SendGrid and if you don't have them set in `config.yaml`)
