@@ -14,7 +14,8 @@ This repository provides a way to have this daily digest sorted by relevance via
 
 ### Some examples:
 
-- Topic: cs.AI, cs.CL
+- Topic: Computer Science
+- Categories: Artificial Intelligence, Computation and Language 
 - Interest: 
   - Large language model pretraining and finetunings
   - Multimodal machine learning
@@ -24,7 +25,7 @@ This repository provides a way to have this daily digest sorted by relevance via
 ![example1](./readme_images/example_1.png)
 
 
-- Topic: q-fin
+- Topic: Quantitative Finance
 - Interest: "making lots of money"
 
 ![example2](./readme_images/example_2.png)
