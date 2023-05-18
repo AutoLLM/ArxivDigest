@@ -1,0 +1,80 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Daily pipeline 
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    # Feel free to change this cron schedule
+    # Currently its scheduled for 1:25 pm UTC, Sun-Thurs
+    - cron:  '25 13 * * 0-4'
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r src/requirements.txt
+    - name: Generate Digest 
+      run: |
+        python src/action.py
+      env:
+        OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+        FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
+        TO_EMAIL: ${{ secrets.TO_EMAIL }}
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: digest.html
+        path: digest.html
+    - name: check
+      id: check
+      env:
+        SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+        MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+        MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+        MAIL_CONNECTION: ${{ secrets.MAIL_CONNECTION }}
+      if: "${{ env.SENDGRID_API_KEY != '' && (env.MAIL_CONNECTION || env.MAIL_USERNAME != '' && env.MAIL_PASSWORD != '') }}"
+      run: echo "DEFINED=true" >> $GITHUB_OUTPUT 
+    - name: Test step
+      env:
+        DEFINED: ${{ steps.check.outputs.DEFINED }}
+      run: echo "$DEFINED"
+    - name: Send mail
+      uses: dawidd6/action-send-mail@v3
+      env:
+        DEFINED: ${{ steps.check.outputs.DEFINED }}
+      if: ${{ env.DEFINED == 'true' }}
+      with:
+        # Specify connection via URL (replaces server_address, server_port, secure,
+        # username and password)
+        #
+        # Format:
+        #
+        #  * smtp://user:password@server:port
+        #  * smtp+starttls://user:password@server:port
+        connection_url: ${{secrets.MAIL_CONNECTION}}
+        # Required mail server address if not connection_url:
+        server_address: smtp.gmail.com
+        # Server port, default 25:
+        server_port: 465
+        username: ${{secrets.MAIL_USERNAME}}
+        password: ${{secrets.MAIL_PASSWORD}}
+        secure: true
+        subject: Personalized arXiv Digest 
+        to: ${{ secrets.TO_EMAIL }} 
+        from: "Personalized arxiv digest" 
+        html_body: file://digest.html
+        ignore_cert: true
+        convert_markdown: true
+        priority: normal 

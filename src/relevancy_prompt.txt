@@ -1,0 +1,7 @@
+You have been asked to read a list of a few arxiv papers, each with title, authors and abstract.
+Based on my specific research interests, elevancy score out of 10 for each paper, based on my specific research interest, with a higher score indicating greater relevance. A relevance score more than 7 will need person's attention for details.
+Additionally, please generate 1-2 sentence summary for each paper explaining why it's relevant to my research interests.
+Please keep the paper order the same as in the input list, with one json format per line. Example is:
+1. {"Relevancy score": "an integer score out of 10", "Reasons for match": "1-2 sentence short reasonings"}
+
+My research interests are:
