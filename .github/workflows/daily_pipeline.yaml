@@ -12,7 +12,7 @@ on:
     - cron:  '25 13 * * 0-4'
 
 jobs:
-  build_and_test:
+  generate_and_send_digest:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -46,10 +46,6 @@ jobs:
         MAIL_CONNECTION: ${{ secrets.MAIL_CONNECTION }}
       if: "${{ env.SENDGRID_API_KEY == '' && (env.MAIL_CONNECTION || env.MAIL_USERNAME != '' && env.MAIL_PASSWORD != '') }}"
       run: echo "DEFINED=true" >> $GITHUB_OUTPUT 
-    - name: Test step
-      env:
-        DEFINED: ${{ steps.check.outputs.DEFINED }}
-      run: echo "$DEFINED"
     - name: Send mail
       uses: dawidd6/action-send-mail@v3
       env:
