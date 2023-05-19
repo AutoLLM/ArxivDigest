@@ -1,20 +1,33 @@
-# Personalized-Arxiv-digest
-This repo aims to provide a better daily digest for newly published arxiv papers based on your own research interests and descriptions.
+# Personalized-arXiv-digest
+This repo aims to provide a better daily digest for newly published arXiv papers based on your own research interests and descriptions.
 
-## What this repo does
+## 📚 Contents
 
-Staying up to date on [arxiv](https://arxiv.org) papers can take a considerable amount of time, with on the order of hundreds of new papers each day to filter through. There is an [official daily digest service](https://info.arxiv.org/help/subscribe.html), however large subtopics like [cs.AI](https://arxiv.org/list/cs.AI/recent) still have 50-100 papers a day. Determining if these papers are relevant and important to you means reading through the title and abstract.
+- [What this repo does](#what-this-repo-does)
+  * [Examples](#some-examples)
+- [Usage](#usage)
+  * [Running as a github action using SendGrid (Recommended)](#running-as-a-github-action-using-sendgrid-recommended)
+  * [Running as a github action with SMTP credentials](#running-as-a-github-action-with-smtp-credentials)
+  * [Running as a github action without emails](#running-as-a-github-action-without-emails)
+  * [Running from the command line](#running-from-the-command-line)
+  * [Running with a user interface](#running-with-a-user-interface)
+- [Roadmap](#roadmap)
+- [Extending and Contributing](#extending-and-contributing)
 
-This repository provides a way to have this daily digest sorted by relevance via large language models:
+## 🔍 What this repo does
 
-* You modify the configuration file `config.yaml` with an arxiv topic, some set of subtopics, and a natural language statement about the type of papers you are interested in
-* The code pulls all the abstracts for papers in those subtopics and ranks how relevant they are to your interest on a scale of 1-10 using gpt-3.5-turbo. 
-* The code then emits an HTML digest listing all the relevant papers, and optionally emails it to you using [SendGrid](https://sendgrid.com). You will need to have a SendGrid account with an API key for this functionality to work
+Staying up to date on [arXiv](https://arxiv.org) papers can take a considerable amount of time, with on the order of hundreds of new papers each day to filter through. There is an [official daily digest service](https://info.arxiv.org/help/subscribe.html), however large categories like [cs.AI](https://arxiv.org/list/cs.AI/recent) still have 50-100 papers a day. Determining if these papers are relevant and important to you means reading through the title and abstract, which is time-consuming.
+
+This repository offers a method to curate a daily digest, sorted by relevance, using large language models. These models are conditioned based on your personal research interests, which are described in natural language. 
+
+* You modify the configuration file `config.yaml` with an arXiv Subject, some set of Categories, and a natural language statement about the type of papers you are interested in.  
+* The code pulls all the abstracts for papers in those categories and ranks how relevant they are to your interest on a scale of 1-10 using `gpt-3.5-turbo`.
+* The code then emits an HTML digest listing all the relevant papers, and optionally emails it to you using [SendGrid](https://sendgrid.com). You will need to have a SendGrid account with an API key for this functionality to work.  
 
 
 ### Some examples:
 
-- Topic: Computer Science
+- Subject: Computer Science
 - Categories: Artificial Intelligence, Computation and Language 
 - Interest: 
   - Large language model pretraining and finetunings
@@ -25,14 +38,14 @@ This repository provides a way to have this daily digest sorted by relevance via
 ![example1](./readme_images/example_1.png)
 
 
-- Topic: Quantitative Finance
+- Subject: Quantitative Finance
 - Interest: "making lots of money"
 
 ![example2](./readme_images/example_2.png)
 
-## Usage
+## 💡 Usage
 
-### Running as a github action using SendGrid.
+### Running as a github action using SendGrid (Recommended).
 
 The recommended way to get started using this repository is to:
 
@@ -67,7 +80,7 @@ An alternative way to get started using this repository is to:
    - `TO_EMAIL` (only if you don't have it set in `config.yaml`)
 6. Manually trigger the action or wait until the scheduled action takes place.
 
-#### Running as a github action without emails 
+### Running as a github action without emails 
 
 If you do not wish to create a SendGrid account or use your email authentication, the action will also emit an artifact containing the HTML output. Simply do not create the SendGrid or SMTP secrets.
 
@@ -99,7 +112,16 @@ Install the requirements in `src/requirements.txt` as well as `gradio`. Set the 
 
 Run `python src/app.py` and go to the local URL. From there you will be able to preview the papers from today, as well as the generated digests.
 
-## Extending and Contributing
+## ✅ Roadmap
+
+- [x] Support personalized paper recommendation using LLM.
+- [x] Send emails for daily digest.
+- [ ] Implement a ranking factor to prioritize content from specific authors.
+- [ ] Support open-source models, e.g., LLaMA, Vicuna, MPT etc.
+- [ ] Fine-tune an open-source model to better support paper ranking and stay updated with the latest research concepts..
+
+
+## 💁 Extending and Contributing
 
 You may (and are encourage to) modify the code in this repository to suit your personal needs. If you think your modifications would be in any way useful to others, please submit a pull request.
 
