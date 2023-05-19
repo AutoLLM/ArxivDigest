@@ -96,11 +96,11 @@ If you do not wish to fork this repository, and would prefer to clone and run it
 2. Modify the configuration file `config.yaml`
 3. Create or fetch your api key for [OpenAI](https://platform.openai.com/account/api-keys). Note: you will need an OpenAI account.
 4. Create or fetch your api key for [SendGrid](https://app.SendGrid.com/settings/api_keys) (optional, if you want the script to email you)
-5. Set the following secrets [(under settings, Secrets and variables, repository secrets)](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository):
+5. Set the following secrets as environment variables: 
    - `OPENAI_API_KEY`
    - `SENDGRID_API_KEY` (only if using SendGrid)
-   - `FROM_EMAIL` (only if using SendGrid and if you don't have them set in `config.yaml`)
-   - `TO_EMAIL` (only if using SendGrid and if you don't have them set in `config.yaml`)
+   - `FROM_EMAIL` (only if using SendGrid and if you don't have it set in `config.yaml`. Note that this value must match the email you used to create the SendGrid Api Key.)
+   - `TO_EMAIL` (only if using SendGrid and if you don't have it set in `config.yaml`)
 6. Run `python action.py`.
 7. If you are not using SendGrid, the html of the digest will be written to `digest.html`. You can then use your favorite webbrowser to view it.
 
@@ -108,7 +108,7 @@ You may want to use something like crontab to schedule the digest.
 
 ### Running with a user interface
 
-Install the requirements in `src/requirements.txt` as well as `gradio`. Set the evironment variables `OPENAI_API_KEY`, `FROM_EMAIL` and `SENDGRID_API_KEY`
+Install the requirements in `src/requirements.txt` as well as `gradio`. Set the evironment variables `OPENAI_API_KEY`, `FROM_EMAIL` and `SENDGRID_API_KEY`. Ensure that `FROM_EMAIL` matches `SENDGRID_API_KEY`.
 
 Run `python src/app.py` and go to the local URL. From there you will be able to preview the papers from today, as well as the generated digests.
 
