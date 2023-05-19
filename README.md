@@ -56,8 +56,8 @@ The recommended way to get started using this repository is to:
 5. Set the following secrets [(under settings, Secrets and variables, repository secrets)](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository):
    - `OPENAI_API_KEY`
    - `SENDGRID_API_KEY`
-   - `FROM_EMAIL` (only if you don't have it set in `config.yaml`)
-   - `TO_EMAIL` (only if you don't have it set in `config.yaml`)
+   - `FROM_EMAIL` This value must match the email you used to create the SendGrid Api Key. This is not needed if you have it set in `config.yaml`.
+   - `TO_EMAIL` Only if you don't have it set in `config.yaml`
 6. Manually trigger the action or wait until the scheduled action takes place.
 
 ![artifact](./readme_images/trigger.png)
