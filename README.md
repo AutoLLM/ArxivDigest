@@ -1,5 +1,5 @@
-# Personalized-arXiv-digest
-This repo aims to provide a better daily digest for newly published arXiv papers based on your own research interests and descriptions.
+# ArxivDigest 
+This repo aims to provide a better daily digest for newly published arXiv papers based on your own research interests and descriptions via relevancy ratings from GPT.
 
 ## 📚 Contents
 
