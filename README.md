@@ -27,7 +27,8 @@ This repository offers a method to curate a daily digest, sorted by relevance, u
 
 ### Some examples:
 
-- Subject: Computer Science
+#### Digest Configuration:
+- Subject/Topic: Computer Science
 - Categories: Artificial Intelligence, Computation and Language 
 - Interest: 
   - Large language model pretraining and finetunings
@@ -35,12 +36,14 @@ This repository offers a method to curate a daily digest, sorted by relevance, u
   - Do not care about specific application, for example, information extraction, summarization, etc.
   - Not interested in paper focus on specific languages, e.g., Arabic, Chinese, etc.
 
+#### Result:
 ![example1](./readme_images/example_1.png)
 
-
-- Subject: Quantitative Finance
+#### Digest Configuration:
+- Subject/Topic: Quantitative Finance
 - Interest: "making lots of money"
 
+#### Result:
 ![example2](./readme_images/example_2.png)
 
 ## 💡 Usage
