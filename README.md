@@ -3,16 +3,16 @@ This repo aims to provide a better daily digest for newly published arXiv papers
 
 ## 📚 Contents
 
-- [What this repo does](#what-this-repo-does)
+- [What this repo does](#🔍-what-this-repo-does)
   * [Examples](#some-examples)
-- [Usage](#usage)
+- [Usage](#💡-usage)
   * [Running as a github action using SendGrid (Recommended)](#running-as-a-github-action-using-sendgrid-recommended)
   * [Running as a github action with SMTP credentials](#running-as-a-github-action-with-smtp-credentials)
   * [Running as a github action without emails](#running-as-a-github-action-without-emails)
   * [Running from the command line](#running-from-the-command-line)
   * [Running with a user interface](#running-with-a-user-interface)
-- [Roadmap](#roadmap)
-- [Extending and Contributing](#extending-and-contributing)
+- [Roadmap](#✅-roadmap)
+- [Extending and Contributing](#💁-extending-and-contributing)
 
 ## 🔍 What this repo does
 
