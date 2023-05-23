@@ -50,7 +50,7 @@ This repository offers a method to curate a daily digest, sorted by relevance, u
 
 ### Hugging Face
 
-The easiest way to get started is at [https://huggingface.co/spaces/AutoLLM/arxiv-digest](https://huggingface.co/spaces/AutoLLM/arxiv-digest). Simply enter your [OpenAI API key](https://platform.openai.com/account/api-keys) and then fill in the configuration on the right. Note that we do not store your key.
+The easiest way to get started is at [https://huggingface.co/spaces/AutoLLM/ArxivDigest](https://huggingface.co/spaces/AutoLLM/ArxivDigest). Simply enter your [OpenAI API key](https://platform.openai.com/account/api-keys) and then fill in the configuration on the right. Note that we do not store your key.
 
 ![hfexample](./readme_images/hf_example.png)
 
