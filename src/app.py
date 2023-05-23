@@ -166,9 +166,9 @@ with gr.Blocks() as demo:
             subject.change(fn=change_subsubject, inputs=[subject, physics_subject], outputs=subsubject)
             physics_subject.change(fn=change_subsubject, inputs=[subject, physics_subject], outputs=subsubject)
 
-            interest = gr.Textbox(label="A natural language description of what you are interested in.", info="Press shift-enter or click the button below to update.", lines=7)
+            interest = gr.Textbox(label="A natural language description of what you are interested in. We will generate relevancy scores (1-10) and explanations for the papers in the selected topics according to this statement.", info="Press shift-enter or click the button below to update.", lines=7)
             sample_btn = gr.Button("Generate Digest")
-            sample_output = gr.Textbox(label="Results for your configuration.", info="For runtime purposes, this is only done on a small subset of recent papers in the topic you have selected.")
+            sample_output = gr.Textbox(label="Results for your configuration.", info="For runtime purposes, this is only done on a small subset of recent papers in the topic you have selected. Papers will not be filtered by relevancy, only sorted on a scale of 1-10.")
         with gr.Column(scale=0.40):
             with gr.Box():
                 title = gr.Markdown(
