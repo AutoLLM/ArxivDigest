@@ -1,6 +1,8 @@
 # ArxivDigest 
 This repo aims to provide a better daily digest for newly published arXiv papers based on your own research interests and descriptions via relevancy ratings from GPT.
 
+You can try it out at [https://huggingface.co/spaces/AutoLLM/ArxivDigest](https://huggingface.co/spaces/AutoLLM/ArxivDigest) using your own OpenAI api key. 
+
 ## 📚 Contents
 
 - [What this repo does](#🔍-what-this-repo-does)
