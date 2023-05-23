@@ -150,7 +150,6 @@ def test(email, topic, physics_topic, categories, interest, key):
 
 
 def register_openai_token(token):
-    print(f"registering new key: {token[:5]}")
     openai.api_key = token
 
 with gr.Blocks() as demo:
@@ -159,7 +158,7 @@ with gr.Blocks() as demo:
             with gr.Box():
                 token = gr.Textbox(label="OpenAI API Key", type="password")
             with gr.Box():
-                description = gr.HTML(value="Send an email to the below address using the configuration on the right. Requires a sendgrid token")
+                description = gr.HTML(value="Send an email to the below address using the configuration on the right. Requires a sendgrid token. These values are not needed to use the right side of this page.\n\n")
                 email = gr.Textbox(label="Email address", type="email", placeholder="")
                 sendgrid_token = gr.Textbox(label="SendGrid API Key", type="password")
                 with gr.Row():
@@ -176,10 +175,12 @@ with gr.Blocks() as demo:
             subject.change(fn=change_subsubject, inputs=[subject, physics_subject], outputs=subsubject)
             physics_subject.change(fn=change_subsubject, inputs=[subject, physics_subject], outputs=subsubject)
 
-            interest = gr.Textbox(label="A natural language description of what you are interested in. Press shift-enter to update.", lines=7)
-            sample_output = gr.Textbox(label="Examples")
+            interest = gr.Textbox(label="A natural language description of what you are interested in. Press shift-enter or click the button below to update.", lines=7)
+            sample_btn = gr.Button("Generate Digest")
+            sample_output = gr.Textbox(label="Results for your configuration")
     test_btn.click(fn=test, inputs=[email, subject, physics_subject, subsubject, interest, sendgrid_token], outputs=output)
     token.change(fn=register_openai_token, inputs=[token])
+    sample_btn.click(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)
     subject.change(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)
     physics_subject.change(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)
     subsubject.change(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)
