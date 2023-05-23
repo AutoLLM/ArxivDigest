@@ -59,7 +59,9 @@ categories_map = {
 
 
 def sample(email, topic, physics_topic, categories, interest):
-    if subject == "Physics":
+    if not topic:
+        raise gr.Error("You must choose a topic.")
+    if topic == "Physics":
         if isinstance(physics_topic, list):
             raise gr.Error("You must choose a physics topic.")
         topic = physics_topic
