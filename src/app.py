@@ -128,7 +128,7 @@ def test(email, topic, physics_topic, categories, interest):
     else:
         body = "<br><br>".join([f'Title: <a href="{paper["main_page"]}">{paper["title"]}</a><br>Authors: {paper["authors"]}' for paper in papers])
     sg = sendgrid.SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
-    from_email = Email("richard.fan@petuum.com")  # Change to your verified sender
+    from_email = Email("") # CHANGE TO YOUR VERIFIED SENDER
     to_email = To(email)
     subject = "arXiv digest"
     content = Content("text/html", body)
