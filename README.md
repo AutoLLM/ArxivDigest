@@ -1,6 +1,10 @@
 # ArxivDigest 
 This repo aims to provide a better daily digest for newly published arXiv papers based on your own research interests and descriptions via relevancy ratings from GPT.
 
+You can try it out at [https://huggingface.co/spaces/AutoLLM/ArxivDigest](https://huggingface.co/spaces/AutoLLM/ArxivDigest) using your own OpenAI api key. 
+
+You can also create a daily subscription pipeline to email you the results.
+
 ## 📚 Contents
 
 - [What this repo does](#🔍-what-this-repo-does)
@@ -24,8 +28,15 @@ This repository offers a method to curate a daily digest, sorted by relevance, u
 * The code pulls all the abstracts for papers in those categories and ranks how relevant they are to your interest on a scale of 1-10 using `gpt-3.5-turbo`.
 * The code then emits an HTML digest listing all the relevant papers, and optionally emails it to you using [SendGrid](https://sendgrid.com). You will need to have a SendGrid account with an API key for this functionality to work.  
 
+### Testing it out with Hugging Face:
 
-### Some examples:
+We provide a demo at [https://huggingface.co/spaces/AutoLLM/ArxivDigest](https://huggingface.co/spaces/AutoLLM/ArxivDigest). Simply enter your [OpenAI API key](https://platform.openai.com/account/api-keys) and then fill in the configuration on the right. Note that we do not store your key.
+
+![hfexample](./readme_images/hf_example.png)
+
+You can also send yourself an email of the digest by creating a SendGrid account and [api key](https://app.SendGrid.com/settings/api_keys).
+
+### Some examples of results:
 
 #### Digest Configuration:
 - Subject/Topic: Computer Science
