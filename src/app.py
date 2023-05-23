@@ -158,7 +158,7 @@ with gr.Blocks() as demo:
             with gr.Box():
                 token = gr.Textbox(label="OpenAI API Key", type="password")
             with gr.Box():
-                description = gr.HTML(value="Send an email to the below address using the configuration on the right. Requires a sendgrid token. These values are not needed to use the right side of this page.\n\n")
+                description = gr.HTML(value="Send an email to the below address using the configuration on the right. Requires a sendgrid token. These values are not needed to use the right side of this page.<br>")
                 email = gr.Textbox(label="Email address", type="email", placeholder="")
                 sendgrid_token = gr.Textbox(label="SendGrid API Key", type="password")
                 with gr.Row():
@@ -170,14 +170,14 @@ with gr.Blocks() as demo:
             )
             physics_subject = gr.Dropdown(physics_topics, value=[], multiselect=False, label="Physics category", visible=False, info="")
             subsubject = gr.Dropdown(
-                    [], value=[], multiselect=True, label="Subtopic", info="", visible=False)
+                    [], value=[], multiselect=True, label="Subtopic", info="Optional. Leaving it empty will use all subtopics.", visible=False)
             subject.change(fn=change_physics, inputs=[subject], outputs=physics_subject)
             subject.change(fn=change_subsubject, inputs=[subject, physics_subject], outputs=subsubject)
             physics_subject.change(fn=change_subsubject, inputs=[subject, physics_subject], outputs=subsubject)
 
-            interest = gr.Textbox(label="A natural language description of what you are interested in. Press shift-enter or click the button below to update.", lines=7)
+            interest = gr.Textbox(label="A natural language description of what you are interested in.", info="Press shift-enter or click the button below to update.", lines=7)
             sample_btn = gr.Button("Generate Digest")
-            sample_output = gr.Textbox(label="Results for your configuration")
+            sample_output = gr.Textbox(label="Results for your configuration.", info="For runtime purposes, this is only done on a small subset of today's papers in the topic you have selected.")
     test_btn.click(fn=test, inputs=[email, subject, physics_subject, subsubject, interest, sendgrid_token], outputs=output)
     token.change(fn=register_openai_token, inputs=[token])
     sample_btn.click(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)
