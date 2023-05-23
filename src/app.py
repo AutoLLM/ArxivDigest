@@ -154,17 +154,8 @@ def register_openai_token(token):
 
 with gr.Blocks() as demo:
     with gr.Row():
-        with gr.Column(scale=0.40):
-            with gr.Box():
-                token = gr.Textbox(label="OpenAI API Key", type="password")
-            with gr.Box():
-                description = gr.HTML(value="Send an email to the below address using the configuration on the right. Requires a sendgrid token. These values are not needed to use the right side of this page.<br>")
-                email = gr.Textbox(label="Email address", type="email", placeholder="")
-                sendgrid_token = gr.Textbox(label="SendGrid API Key", type="password")
-                with gr.Row():
-                    test_btn = gr.Button("Send email")
-                    output = gr.Textbox(show_label=False, placeholder="email status")
         with gr.Column(scale=1):
+            token = gr.Textbox(label="OpenAI API Key", type="password")
             subject = gr.Radio(
                 list(topics.keys()), label="Topic"
             )
@@ -177,7 +168,22 @@ with gr.Blocks() as demo:
 
             interest = gr.Textbox(label="A natural language description of what you are interested in.", info="Press shift-enter or click the button below to update.", lines=7)
             sample_btn = gr.Button("Generate Digest")
-            sample_output = gr.Textbox(label="Results for your configuration.", info="For runtime purposes, this is only done on a small subset of today's papers in the topic you have selected.")
+            sample_output = gr.Textbox(label="Results for your configuration.", info="For runtime purposes, this is only done on a small subset of recent papers in the topic you have selected.")
+        with gr.Column(scale=0.40):
+            with gr.Box():
+                title = gr.Markdown(
+                    """
+                    # Email Setup, Optional
+                    Send an email to the below address using the configuration on the right. Requires a sendgrid token. These values are not needed to use the right side of this page.
+
+                    To create a scheduled job for this, see our [Github Repository](https://github.com/AutoLLM/ArxivDigest)
+                    """,
+                    interactive=False, show_label=False)
+                email = gr.Textbox(label="Email address", type="email", placeholder="")
+                sendgrid_token = gr.Textbox(label="SendGrid API Key", type="password")
+                with gr.Row():
+                    test_btn = gr.Button("Send email")
+                    output = gr.Textbox(show_label=False, placeholder="email status")
     test_btn.click(fn=test, inputs=[email, subject, physics_subject, subsubject, interest, sendgrid_token], outputs=output)
     token.change(fn=register_openai_token, inputs=[token])
     sample_btn.click(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)
@@ -186,4 +192,4 @@ with gr.Blocks() as demo:
     subsubject.change(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)
     interest.submit(fn=sample, inputs=[email, subject, physics_subject, subsubject, interest], outputs=sample_output)
 
-demo.launch()
+demo.launch(show_api=False)
