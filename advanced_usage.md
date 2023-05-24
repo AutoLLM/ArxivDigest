@@ -1,6 +1,6 @@
 # Advanced Usage
 
-## Step-by-step instructions
+## Step-by-step instructions for running as a Github action
 
 ### Fork the repository
 
