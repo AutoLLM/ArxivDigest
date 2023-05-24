@@ -120,23 +120,23 @@ if __name__ == "__main__":
     to_email = os.environ.get("TO_EMAIL")
     threshold = config["threshold"]
     interest = config["interest"]
+    body = generate_body(topic, categories, interest, threshold)
     with open("digest.html", "w") as f:
-        body = generate_body(topic, categories, interest, threshold)
         f.write(body)
-        if os.environ.get('SENDGRID_API_KEY', None):
-            sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
-            from_email = Email(from_email)  # Change to your verified sender
-            to_email = To(to_email)
-            subject = date.today().strftime("Personalized arXiv Digest, %d %b %Y")
-            content = Content("text/html", body)
-            mail = Mail(from_email, to_email, subject, content)
-            mail_json = mail.get()
+    if os.environ.get('SENDGRID_API_KEY', None):
+        sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
+        from_email = Email(from_email)  # Change to your verified sender
+        to_email = To(to_email)
+        subject = date.today().strftime("Personalized arXiv Digest, %d %b %Y")
+        content = Content("text/html", body)
+        mail = Mail(from_email, to_email, subject, content)
+        mail_json = mail.get()
 
-            # Send an HTTP POST request to /mail/send
-            response = sg.client.mail.send.post(request_body=mail_json)
-            if response.status_code >= 200 and response.status_code <= 300:
-                print("Send test email: Success!")
-            else:
-                print("Send test email: Failure ({response.status_code}, {response.text})")
+        # Send an HTTP POST request to /mail/send
+        response = sg.client.mail.send.post(request_body=mail_json)
+        if response.status_code >= 200 and response.status_code <= 300:
+            print("Send test email: Success!")
         else:
-            print("No sendgrid api key found. Skipping email")
+            print("Send test email: Failure ({response.status_code}, {response.text})")
+    else:
+        print("No sendgrid api key found. Skipping email")
