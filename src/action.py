@@ -116,8 +116,8 @@ if __name__ == "__main__":
 
     topic = config["topic"]
     categories = config["categories"]
-    from_email = config.get("from_email") or os.environ.get("FROM_EMAIL")
-    to_email = config.get("to_email") or os.environ.get("TO_EMAIL")
+    from_email = os.environ.get("FROM_EMAIL")
+    to_email = os.environ.get("TO_EMAIL")
     threshold = config["threshold"]
     interest = config["interest"]
     with open("digest.html", "w") as f:

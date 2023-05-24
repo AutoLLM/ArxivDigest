@@ -5,17 +5,6 @@ topic: "Computer Science"
 # Including more categories will result in more calls to the large language model
 categories: ["Artificial Intelligence", "Computation and Language"]
 
-# The email address that the digest will be sent from. must be the address matching
-# your sendgrid api key.
-# Leaving this empty will cause the script to use the
-# FROM_EMAIL environment variable instead
-from_email: ""
-
-# The email address you are going to send the digest to
-# Leaving this empty will cause the script to use the
-# TO_EMAIL environment variable instead
-to_email: ""
-
 # Relevance score threshold. abstracts that receive a score less than this from the large language model
 # will have their papers filtered out.
 #

@@ -61,8 +61,8 @@ An alternative way to get started using this repository is to:
    - `MAIL_CONNECTION` (see above)
    - `MAIL_PASSWORD` (only if you don't have `MAIL_CONNECTION` set)
    - `MAIL_USERNAME` (only if you don't have `MAIL_CONNECTION` set)
-   - `FROM_EMAIL` (only if you don't have it set in `config.yaml`)
-   - `TO_EMAIL` (only if you don't have it set in `config.yaml`)
+   - `FROM_EMAIL`
+   - `TO_EMAIL`
 6. Manually trigger the action or wait until the scheduled action takes place.
 
 ### Running as a github action without emails 
@@ -84,8 +84,8 @@ If you do not wish to fork this repository, and would prefer to clone and run it
 5. Set the following secrets as environment variables: 
    - `OPENAI_API_KEY`
    - `SENDGRID_API_KEY` (only if using SendGrid)
-   - `FROM_EMAIL` (only if using SendGrid and if you don't have it set in `config.yaml`. Note that this value must match the email you used to create the SendGrid Api Key.)
-   - `TO_EMAIL` (only if using SendGrid and if you don't have it set in `config.yaml`)
+   - `FROM_EMAIL` (only if using SendGrid. Note that this value must match the email you used to create the SendGrid Api Key.)
+   - `TO_EMAIL` (only if using SendGrid)
 6. Run `python action.py`.
 7. If you are not using SendGrid, the html of the digest will be written to `digest.html`. You can then use your favorite webbrowser to view it.
 
