@@ -68,7 +68,7 @@ The recommended way to get started using this repository is to:
 
 1. Fork the repository
 2. Modify `config.yaml` and merge the changes into your main branch.
-3. Set the following secrets [(under settings, Secrets and variables, repository secrets)](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository). See [Advanced Usage](./advanced_usage.md) for more details on how to create and get OpenAi and SendGrid API keys:
+3. Set the following secrets [(under settings, Secrets and variables, repository secrets)](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository). See [Advanced Usage](./advanced_usage.md#create-and-fetch-your-api-keys) for more details on how to create and get OpenAi and SendGrid API keys:
    - `OPENAI_API_KEY` From [OpenAI](https://platform.openai.com/account/api-keys)
    - `SENDGRID_API_KEY` From [SendGrid](https://app.SendGrid.com/settings/api_keys)
    - `FROM_EMAIL` This value must match the email you used to create the SendGrid API Key.
