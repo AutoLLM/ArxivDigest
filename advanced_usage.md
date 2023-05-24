@@ -22,9 +22,10 @@ Modify `config.yaml` by cloning the respository and merging your changes
 ### Set the secrets for the github action
 
 Go to the Settings tab on the top of this page, and then the "Actions" menu under "Secrets and variables":
+
 ![settings](./readme_images/settings.png)
 
-Create a new repository secret for each of the following
+Create a new repository secret for each of the following using the button in the below image:
 - `OPENAI_API_KEY`
 - `SENDGRID_API_KEY`
 - `FROM_EMAIL`
