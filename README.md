@@ -1,4 +1,4 @@
-<p align="center"><img src="./readme_images/banner.png" width=500 /></p>
+<p align="center"><img src="./readme_images/banner.png" width=450 /></p>
 
 **ArXiv Digest and Personalized Recommendations using Large Language Models.**
 
