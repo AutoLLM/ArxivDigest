@@ -51,14 +51,14 @@ You can also send yourself an email of the digest by creating a SendGrid account
   - Not interested in paper focus on specific languages, e.g., Arabic, Chinese, etc.
 
 #### Result:
-<p align="center"><img src="./readme_images/example_1.png" width=650 /></p>
+<p align="left"><img src="./readme_images/example_1.png" width=580 /></p>
 
 #### Digest Configuration:
 - Subject/Topic: Quantitative Finance
 - Interest: "making lots of money"
 
 #### Result:
-<p align="center"><img src="./readme_images/example_2.png" width=650 /></p>
+<p align="left"><img src="./readme_images/example_2.png" width=580 /></p>
 
 ## 💡 Usage
 
