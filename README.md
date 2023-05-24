@@ -1,7 +1,10 @@
-# ArxivDigest 
-This repo aims to provide a better daily digest for newly published arXiv papers based on your own research interests and descriptions via relevancy ratings from GPT.
+<p align="center"><img src="./readme_images/banner.png" width=500 /></p>
 
-You can try it out at [https://huggingface.co/spaces/AutoLLM/ArxivDigest](https://huggingface.co/spaces/AutoLLM/ArxivDigest) using your own OpenAI api key. 
+**ArXiv Digest and Personalized Recommendations using Large Language Models.**
+
+This repo aims to provide a better daily digest for newly published arXiv papers based on your own research interests and natural-language descriptions, using relevancy ratings from GPT.
+
+You can try it out on [Hugging Face](https://huggingface.co/spaces/AutoLLM/ArxivDigest) using your own OpenAI API key.
 
 You can also create a daily subscription pipeline to email you the results.
 
@@ -34,7 +37,7 @@ We provide a demo at [https://huggingface.co/spaces/AutoLLM/ArxivDigest](https:/
 
 ![hfexample](./readme_images/hf_example.png)
 
-You can also send yourself an email of the digest by creating a SendGrid account and [api key](https://app.SendGrid.com/settings/api_keys).
+You can also send yourself an email of the digest by creating a SendGrid account and [API key](https://app.SendGrid.com/settings/api_keys).
 
 ### Some examples of results:
 
@@ -48,14 +51,14 @@ You can also send yourself an email of the digest by creating a SendGrid account
   - Not interested in paper focus on specific languages, e.g., Arabic, Chinese, etc.
 
 #### Result:
-![example1](./readme_images/example_1.png)
+<p align="left"><img src="./readme_images/example_1.png" width=580 /></p>
 
 #### Digest Configuration:
 - Subject/Topic: Quantitative Finance
 - Interest: "making lots of money"
 
 #### Result:
-![example2](./readme_images/example_2.png)
+<p align="left"><img src="./readme_images/example_2.png" width=580 /></p>
 
 ## 💡 Usage
 
@@ -65,12 +68,12 @@ The recommended way to get started using this repository is to:
 
 1. Fork the repository
 2. Modify `config.yaml` and merge the changes into your main branch. If you want a different schedule than Sunday through Thursday at 1:25PM UTC, then also modify the file `.github/workflows/daily_pipeline.yaml`
-3. Create or fetch your api key for [OpenAI](https://platform.openai.com/account/api-keys). Note: you will need an OpenAI account.
-4. Create or fetch your api key for [SendGrid](https://app.SendGrid.com/settings/api_keys). You will need a SendGrid account. The free tier will generally suffice. Make sure to [verify your sender identity](https://docs.sendgrid.com/for-developers/sending-email/sender-identity).
+3. Create or fetch your API key for [OpenAI](https://platform.openai.com/account/api-keys). Note: you will need an OpenAI account.
+4. Create or fetch your API key for [SendGrid](https://app.SendGrid.com/settings/api_keys). You will need a SendGrid account. The free tier will generally suffice. Make sure to [verify your sender identity](https://docs.sendgrid.com/for-developers/sending-email/sender-identity).
 5. Set the following secrets [(under settings, Secrets and variables, repository secrets)](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository):
    - `OPENAI_API_KEY`
    - `SENDGRID_API_KEY`
-   - `FROM_EMAIL` This value must match the email you used to create the SendGrid Api Key. This is not needed if you have it set in `config.yaml`.
+   - `FROM_EMAIL` This value must match the email you used to create the SendGrid API Key. This is not needed if you have it set in `config.yaml`.
    - `TO_EMAIL` Only if you don't have it set in `config.yaml`
 6. Manually trigger the action or wait until the scheduled action takes place.
 
@@ -83,7 +86,7 @@ An alternative way to get started using this repository is to:
 
 1. Fork the repository
 2. Modify `config.yaml` and merge the changes into your main branch. If you want a different schedule than Sunday through Thursday at 1:25PM UTC, then also modify the file `.github/workflows/daily_pipeline.yaml`
-3. Create or fetch your api key for [OpenAI](https://platform.openai.com/account/api-keys). Note: you will need an OpenAI account.
+3. Create or fetch your API key for [OpenAI](https://platform.openai.com/account/api-keys). Note: you will need an OpenAI account.
 4. Find your email provider's SMTP settings and set the secret `MAIL_CONNECTION` to that. It should be in the form `smtp://user:password@server:port` or `smtp+starttls://user:password@server:port`. Alternatively, if you are using Gmail, you can set `MAIL_USERNAME` and `MAIL_PASSWORD` instead, using an [application password](https://support.google.com/accounts/answer/185833).
 5. Set the following secrets [(under settings, Secrets and variables, repository secrets)](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository):
    - `OPENAI_API_KEY`
@@ -108,12 +111,12 @@ If you do not wish to fork this repository, and would prefer to clone and run it
 
 1. Install the requirements in `src/requirements.txt`
 2. Modify the configuration file `config.yaml`
-3. Create or fetch your api key for [OpenAI](https://platform.openai.com/account/api-keys). Note: you will need an OpenAI account.
-4. Create or fetch your api key for [SendGrid](https://app.SendGrid.com/settings/api_keys) (optional, if you want the script to email you)
+3. Create or fetch your API key for [OpenAI](https://platform.openai.com/account/api-keys). Note: you will need an OpenAI account.
+4. Create or fetch your API key for [SendGrid](https://app.SendGrid.com/settings/api_keys) (optional, if you want the script to email you)
 5. Set the following secrets as environment variables: 
    - `OPENAI_API_KEY`
    - `SENDGRID_API_KEY` (only if using SendGrid)
-   - `FROM_EMAIL` (only if using SendGrid and if you don't have it set in `config.yaml`. Note that this value must match the email you used to create the SendGrid Api Key.)
+   - `FROM_EMAIL` (only if using SendGrid and if you don't have it set in `config.yaml`. Note that this value must match the email you used to create the SendGrid API Key.)
    - `TO_EMAIL` (only if using SendGrid and if you don't have it set in `config.yaml`)
 6. Run `python action.py`.
 7. If you are not using SendGrid, the html of the digest will be written to `digest.html`. You can then use your favorite webbrowser to view it.
