@@ -14,10 +14,10 @@ Modify `config.yaml` by cloning the respository and merging your changes
 
 ### Create and Fetch your API Keys 
 
-Create or fetch your API key for [OpenAI](https://platform.openai.com/account/api-keys). Note: you will need an OpenAI account.
+- Create or fetch your API key for [OpenAI](https://platform.openai.com/account/api-keys). Note: you will need an OpenAI account.
 ![fork](./readme_images/openai.png)
 
-Create or fetch your API key for [SendGrid](https://app.SendGrid.com/settings/api_keys). You will need a SendGrid account. The free tier will generally suffice. Make sure to [verify your sender identity](https://docs.sendgrid.com/for-developers/sending-email/sender-identity).
+- Create or fetch your API key for [SendGrid](https://app.SendGrid.com/settings/api_keys). You will need a SendGrid account. The free tier will generally suffice. Make sure to [verify your sender identity](https://docs.sendgrid.com/for-developers/sending-email/sender-identity).
 
 ### Set the secrets for the github action
 
