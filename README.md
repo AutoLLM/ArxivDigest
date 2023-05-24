@@ -1,7 +1,10 @@
-# ArxivDigest 
-This repo aims to provide a better daily digest for newly published arXiv papers based on your own research interests and descriptions via relevancy ratings from GPT.
+<p align="center"><img src="./readme_images/banner.png" width=500 /></p>
 
-You can try it out at [https://huggingface.co/spaces/AutoLLM/ArxivDigest](https://huggingface.co/spaces/AutoLLM/ArxivDigest) using your own OpenAI api key. 
+**ArXiv Digest and Personalized Recommendations using Large Language Models.**
+
+This repo aims to provide a better daily digest for newly published arXiv papers based on your own research interests and natural-language descriptions, using relevancy ratings from GPT.
+
+You can try it out on [Hugging Face](https://huggingface.co/spaces/AutoLLM/ArxivDigest) using your own OpenAI api key.
 
 You can also create a daily subscription pipeline to email you the results.
 
@@ -48,14 +51,14 @@ You can also send yourself an email of the digest by creating a SendGrid account
   - Not interested in paper focus on specific languages, e.g., Arabic, Chinese, etc.
 
 #### Result:
-![example1](./readme_images/example_1.png)
+<p align="center"><img src="./readme_images/example_1.png" width=650 /></p>
 
 #### Digest Configuration:
 - Subject/Topic: Quantitative Finance
 - Interest: "making lots of money"
 
 #### Result:
-![example2](./readme_images/example_2.png)
+<p align="center"><img src="./readme_images/example_2.png" width=650 /></p>
 
 ## 💡 Usage
 
