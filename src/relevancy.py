@@ -19,7 +19,7 @@ import utils
 
 def encode_prompt(query, prompt_papers):
     """Encode multiple prompt instructions into a single string."""
-    prompt = open("src/relevancy_prompt.txt").read() + "\n"
+    prompt = open("relevancy_prompt.txt").read() + "\n"
     prompt += query['interest']
 
     for idx, task_dict in enumerate(prompt_papers):
@@ -132,7 +132,7 @@ def generate_relevance_score(
         print(f"Post-processing took {time.time() - process_start:.2f}s")
 
     if sorting:
-        ans_data = sorted(ans_data, key=lambda x: x["Relevancy score"], reverse=True)
+        ans_data = sorted(ans_data, key=lambda x: int(x["Relevancy score"]), reverse=True)
     
     return ans_data, hallucination
 
