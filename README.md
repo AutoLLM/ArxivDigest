@@ -83,7 +83,9 @@ To locally run the same UI as the Huggign Face space:
  
 1. Install the requirements in `src/requirements.txt` as well as `gradio`.
 2. Run `python src/app.py` and go to the local URL. From there you will be able to preview the papers from today, as well as the generated digests.
+3. If you want to run the action locally you can copy .env.template to .env and then set the environment variables in the .env file.
 
+> **NOTE:** This is an important note! Do not commit your .env file to your repository, it might reveal you API keys.
 
 ## ✅ Roadmap
 
