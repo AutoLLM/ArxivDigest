@@ -2,7 +2,7 @@
 run:
 python -m relevancy run_all_day_paper \
   --output_dir ./data \
-  --model_name="gpt-3.5-turbo" \
+  --model_name="gpt-3.5-turbo-16k" \
 """
 import time
 import json
@@ -53,7 +53,7 @@ def post_process_chat_gpt_response(paper_data, response, threshold_score=8):
     scores = []
     for item in score_items:
         temp = item["Relevancy score"]
-        if "/" in temp:
+        if isinstance(temp, str) and "/" in temp:
             scores.append(int(temp.split("/")[0]))
         else:
             scores.append(int(temp))
@@ -72,7 +72,7 @@ def post_process_chat_gpt_response(paper_data, response, threshold_score=8):
         output_str += "Link: " + paper_data[idx]["main_page"] + "\n"
         for key, value in inst.items():
             paper_data[idx][key] = value
-            output_str += key + ": " + value + "\n"
+            output_str += str(key) + ": " + str(value) + "\n"
         paper_data[idx]['summarized_text'] = output_str
         selected_data.append(paper_data[idx])
     return selected_data, hallucination
@@ -90,7 +90,7 @@ def process_subject_fields(subjects):
 def generate_relevance_score(
     all_papers,
     query,
-    model_name="gpt-3.5-turbo",
+    model_name="gpt-3.5-turbo-16k",
     threshold_score=8,
     num_paper_in_prompt=4,
     temperature=0.4,
@@ -132,7 +132,7 @@ def generate_relevance_score(
         print(f"Post-processing took {time.time() - process_start:.2f}s")
 
     if sorting:
-        ans_data = sorted(ans_data, key=lambda x: x["Relevancy score"], reverse=True)
+        ans_data = sorted(ans_data, key=lambda x: int(x["Relevancy score"]), reverse=True)
     
     return ans_data, hallucination
 
@@ -140,7 +140,7 @@ def run_all_day_paper(
     query={"interest":"", "subjects":["Computation and Language", "Artificial Intelligence"]},
     date=None,
     data_dir="../data",
-    model_name="gpt-3.5-turbo",
+    model_name="gpt-3.5-turbo-16k",
     threshold_score=8,
     num_paper_in_prompt=8,
     temperature=0.4,
