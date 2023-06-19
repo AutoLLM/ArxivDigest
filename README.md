@@ -88,7 +88,7 @@ To locally run the same UI as the Huggign Face space:
 - The .env file is one of the files in .gitignore, this means that git does not track it and it will not be uploaded to the repository, accidentally.
 - For this reason you should not edit the original .env.template and put the keys or your email address in the original file, since the .template.env is tracked by git and editing it might cause you to commit it with your API keys.
 
-> **NOTE:** This is an important note! Do not edit and commit  your .env.template with your personal key, or email, it might reveal your  personal data such as API keys and email.
+> **WARNING:** This is an important note! Do not edit and commit  your .env.template with your personal key, or email, it might reveal your  personal data such as API keys and email.
 
 ## ✅ Roadmap
 
