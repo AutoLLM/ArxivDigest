@@ -7,7 +7,7 @@ import argparse
 import yaml
 import os
 from dotenv import load_dotenv
-
+import openai
 from relevancy import generate_relevance_score, process_subject_fields
 from download_new_papers import get_papers
 
@@ -280,8 +280,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
     with open(args.config, "r") as f:
         config = yaml.safe_load(f)
+
     if "OPENAI_API_KEY" not in os.environ:
         raise RuntimeError("No openai api key found")
+    openai.api_key = os.environ.get("OPENAI_API_KEY")
 
     topic = config["topic"]
     categories = config["categories"]
