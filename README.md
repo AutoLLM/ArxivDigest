@@ -86,9 +86,9 @@ To locally run the same UI as the Huggign Face space:
 3. If you want to run the action locally you can copy .env.template to .env and then set the environment variables in the .env file.
 - This file may be hidden by default in some operating systems due to the dot prefix. To reveal hidden files, follow the instructions for your 
 - The .env file is one of the files in .gitignore, this means that git does not track it and it will not be uploaded to the repository, accidentally.
-- For this reason you should not edit the original .env.template and put the keys in the original file, since the .template.env is tracked by git and editing it might cause you to commit it with your API keys.
+- For this reason you should not edit the original .env.template and put the keys or your email address in the original file, since the .template.env is tracked by git and editing it might cause you to commit it with your API keys.
 
-> **NOTE:** This is an important note! Do not edit and commit  your .env.template with your personal key, it might reveal you API keys.
+> **NOTE:** This is an important note! Do not edit and commit  your .env.template with your personal key, or email, it might reveal your  personal data such as API keys and email.
 
 ## ✅ Roadmap
 
