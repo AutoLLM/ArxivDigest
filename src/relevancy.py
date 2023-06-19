@@ -108,7 +108,7 @@ def generate_relevance_score(
         decoding_args = utils.OpenAIDecodingArguments(
             temperature=temperature,
             n=1,
-            max_tokens=1072,  # hard-code to maximize the length. the requests will be automatically adjusted
+            max_tokens=128*num_paper_in_prompt, # The response for each paper should be less than 128 tokens. 
             top_p=top_p,
         )
         request_start = time.time()
@@ -118,7 +118,6 @@ def generate_relevance_score(
             batch_size=1,
             decoding_args=decoding_args,
             logit_bias={"100257": -100},  # prevent the <|endoftext|> from being generated
-            # "100265":-100, "100276":-100 for <|im_end|> and <endofprompt> token 
         )
         print ("response", response['message']['content'])
         request_duration = time.time() - request_start
