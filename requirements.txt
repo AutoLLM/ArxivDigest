@@ -1,8 +1,0 @@
-PyYAML==6.0
-beautifulsoup4==4.12.2
-numpy==1.24.2
-openai==0.27.8
-python-dotenv==1.0.0
-pytz==2023.3
-sendgrid==6.10.0
-tqdm==4.65.0
