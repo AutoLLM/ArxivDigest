@@ -36,7 +36,7 @@ jobs:
         python3 -m poetry install
     - name: Generate Digest 
       run: |
-        python3 -m poetry run src/action.py
+        python3 -m poetry run python3 src/action.py
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
