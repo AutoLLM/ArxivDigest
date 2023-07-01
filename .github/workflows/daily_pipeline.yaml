@@ -33,10 +33,10 @@ jobs:
         key: ${{ runner.os }}-venv-${{ hashFiles('**/poetry.lock') }}
     - name: Install dependencies
       run: |
-        python -m poetry install
+        python3 -m poetry install
     - name: Generate Digest 
       run: |
-        python src/action.py
+        python3 -m poetry run src/action.py
       env:
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
