@@ -18,6 +18,13 @@ Modify `config.yaml` by cloning the respository and merging your changes
 ![fork](./readme_images/openai.png)
 
 - Create or fetch your API key for [SendGrid](https://app.SendGrid.com/settings/api_keys). You will need a SendGrid account. The free tier will generally suffice. Make sure to [verify your sender identity](https://docs.sendgrid.com/for-developers/sending-email/sender-identity).
+   - Sign Up for [SendGrid](https://app.sendgrid.com). Fill in the necessary information, including email, password, and a company name. If you don't have a company, you can use a made-up name.
+   - You'll need to verify your email address to activate your account.
+   - On your main dashboard, access the Integration Guide under Email API
+   - Next, on the "Integrate using our Web API or SMTP Relay"-page, choose the "Web API" option.
+   - Choose the language you're planning to use, in this case, select "Python".
+   - You'll be prompted to provide a name for your API key. Enter a name and click "Create Key".
+   - Copy the API Key that appears for the next step below. You won't be able to view the full key again.
 
 ### Set the secrets for the github action
 
