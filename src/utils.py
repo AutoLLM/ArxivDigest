@@ -9,6 +9,7 @@ import json
 from typing import Optional, Sequence, Union
 
 import openai
+import litellm
 import tqdm
 from openai import openai_object
 import copy
@@ -70,6 +71,7 @@ def openai_completion(
             - a list of objects of the above types (if decoding_args.n > 1)
     """
     is_chat_model = "gpt-3.5" in model_name or "gpt-4" in model_name
+    is_litellm_model = model_name in litellm.model_list
     is_single_prompt = isinstance(prompts, (str, dict))
     if is_single_prompt:
         prompts = [prompts]
@@ -107,6 +109,14 @@ def openai_completion(
                 )
                 if is_chat_model:
                     completion_batch = openai.ChatCompletion.create(
+                        messages=[
+                            {"role": "system", "content": "You are a helpful assistant."},
+                            {"role": "user", "content": prompt_batch[0]}
+                        ],
+                        **shared_kwargs
+                    )
+                elif is_litellm_model:
+                    completion_batch = litellm.completion(
                         messages=[
                             {"role": "system", "content": "You are a helpful assistant."},
                             {"role": "user", "content": prompt_batch[0]}
