@@ -1,0 +1,177 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+        <title>Design Automation Papers</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+            .paper { margin-bottom: 30px; border-bottom: 1px solid #ddd; padding-bottom: 20px; }
+            .title { font-size: 18px; font-weight: bold; color: #2c3e50; }
+            .authors { font-style: italic; margin: 5px 0; }
+            .categories { color: #3498db; margin-bottom: 10px; }
+            .abstract { margin-top: 10px; }
+            .techniques { margin-top: 10px; color: #16a085; }
+            a { color: #2980b9; text-decoration: none; }
+            a:hover { text-decoration: underline; }
+            .stats { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+            .footer { margin-top: 30px; font-size: 12px; color: #7f8c8d; text-align: center; }
+        </style>
+    </head>
+    <body>
+        <h1>Design Automation Papers</h1>
+        <div class="stats">
+            <p>Found 18 papers related to graphic design automation with AI/ML</p>
+            <p>Generated on 2025-04-06 13:57:23</p>
+        </div>
+    <div class='stats'><h2>Summary Statistics</h2><h3>Categories:</h3><ul><li>Layout Generation: 7 papers</li><li>Layout Generation, UI/UX Design: 6 papers</li><li>Layout Generation, UI/UX Design, Image Manipulation: 1 papers</li><li>UI/UX Design, Design Tools: 1 papers</li><li>Layout Generation, UI/UX Design, 3D Design: 1 papers</li><li>Layout Generation, Multimodal Design: 1 papers</li><li>Layout Generation, UI/UX Design, Design Tools: 1 papers</li></ul><h3>Techniques:</h3><ul><li>Reinforcement Learning: 11 papers</li><li>Transformers: 4 papers</li><li>Computer Vision: 3 papers</li><li>Large Language Models: 3 papers</li><li>Diffusion Models: 2 papers</li></ul></div>
+        <div class="paper">
+            <div class="title"><a href="https://arxiv.org/abs/2504.02828">Concept Lancet: Image Editing with Compositional Representation Transplant</a></div>
+            <div class="authors">Jinqi Luo, Tianjiao Ding, Kwan Ho Ryan Chan, Hancheng Min, Chris Callison-Burch, René Vidal</div>
+            <div class="categories">Category: Layout Generation, UI/UX Design, Image Manipulation | Subject: Computer Vision and Pattern Recognition (cs.CV); Artificial Intelligence (cs.AI); Computation and Language (cs.CL)</div>
+            <div class="techniques">Techniques: Diffusion Models</div>
+            <div class="abstract"><strong>Abstract:</strong> Diffusion models are widely used for image editing tasks. Existing editing methods often design a representation manipulation procedure by curating an edit direction in the text embedding or score space. However, such a procedure faces a key challenge: overestimating the edit strength harms visual consistency while underestimating it fails the editing task. Notably, each source image may require a different editing strength, and it is costly to search for an appropriate strength via trial-and-error. To address this challenge, we propose Concept Lancet (CoLan), a zero-shot plug-and-play framework for principled representation manipulation in diffusion-based image editing. At inference time, we decompose the source input in the latent (text embedding or diffusion score) space as a sparse linear combination of the representations of the collected visual concepts. This allows us to accurately estimate the presence of concepts in each image, which informs the edit. Based on the editing task (replace/add/remove), we perform a customized concept transplant process to impose the corresponding editing direction. To sufficiently model the concept space, we curate a conceptual representation dataset, CoLan-150K, which contains diverse descriptions and scenarios of visual terms and phrases for the latent dictionary. Experiments on multiple diffusion-based image editing baselines show that methods equipped with CoLan achieve state-of-the-art performance in editing effectiveness and consistency preservation.</div>
+        </div>
+        
+        <div class="paper">
+            <div class="title"><a href="https://arxiv.org/abs/2504.02692">GPTQv2: Efficient Finetuning-Free Quantization for Asymmetric Calibration</a></div>
+            <div class="authors">Yuhang Li, Ruokai Yin, Donghyun Lee, Shiting Xiao, Priyadarshini Panda</div>
+            <div class="categories">Category: Layout Generation | Subject: Machine Learning (cs.LG)</div>
+            <div class="techniques">Techniques: Transformers, Reinforcement Learning, Computer Vision, Large Language Models</div>
+            <div class="abstract"><strong>Abstract:</strong> We introduce GPTQv2, a novel finetuning-free quantization method for compressing large-scale transformer architectures. Unlike the previous GPTQ method, which independently calibrates each layer, we always match the quantized layer's output to the exact output in the full-precision model, resulting in a scheme that we call asymmetric calibration. Such a scheme can effectively reduce the quantization error accumulated in previous layers. We analyze this problem using optimal brain compression to derive a close-formed solution. The new solution explicitly minimizes the quantization error as well as the accumulated asymmetry error. Furthermore, we utilize various techniques to parallelize the solution calculation, including channel parallelization, neuron decomposition, and Cholesky reformulation for matrix fusion. As a result, GPTQv2 is easy to implement, simply using 20 more lines of code than GPTQ but improving its performance under low-bit quantization. Remarkably, on a single GPU, we quantize a 405B language transformer as well as EVA-02 the rank first vision transformer that achieves 90% pretraining Imagenet accuracy. Code is available at this http URL.</div>
+        </div>
+        
+        <div class="paper">
+            <div class="title"><a href="https://arxiv.org/abs/2504.02667">Compositionality Unlocks Deep Interpretable Models</a></div>
+            <div class="authors">Thomas Dooms, Ward Gauderis, Geraint A. Wiggins, Jose Oramas</div>
+            <div class="categories">Category: Layout Generation | Subject: Machine Learning (cs.LG)</div>
+            <div class="techniques">Techniques: </div>
+            <div class="abstract"><strong>Abstract:</strong> We propose $\chi$-net, an intrinsically interpretable architecture combining the compositional multilinear structure of tensor networks with the expressivity and efficiency of deep neural networks. $\chi$-nets retain equal accuracy compared to their baseline counterparts. Our novel, efficient diagonalisation algorithm, ODT, reveals linear low-rank structure in a multilayer SVHN model. We leverage this toward formal weight-based interpretability and model compression.</div>
+        </div>
+        
+        <div class="paper">
+            <div class="title"><a href="https://arxiv.org/abs/2504.02620">Efficient Model Editing with Task-Localized Sparse Fine-tuning</a></div>
+            <div class="authors">Leonardo Iurada, Marco Ciccone, Tatiana Tommasi</div>
+            <div class="categories">Category: Layout Generation, UI/UX Design | Subject: Machine Learning (cs.LG); Artificial Intelligence (cs.AI); Computation and Language (cs.CL); Computer Vision and Pattern Recognition (cs.CV)</div>
+            <div class="techniques">Techniques: Reinforcement Learning</div>
+            <div class="abstract"><strong>Abstract:</strong> Task arithmetic has emerged as a promising approach for editing models by representing task-specific knowledge as composable task vectors. However, existing methods rely on network linearization to derive task vectors, leading to computational bottlenecks during training and inference. Moreover, linearization alone does not ensure weight disentanglement, the key property that enables conflict-free composition of task vectors. To address this, we propose TaLoS which allows to build sparse task vectors with minimal interference without requiring explicit linearization and sharing information across tasks. We find that pre-trained models contain a subset of parameters with consistently low gradient sensitivity across tasks, and that sparsely updating only these parameters allows for promoting weight disentanglement during fine-tuning. Our experiments prove that TaLoS improves training and inference efficiency while outperforming current methods in task addition and negation. By enabling modular parameter editing, our approach fosters practical deployment of adaptable foundation models in real-world applications.</div>
+        </div>
+        
+        <div class="paper">
+            <div class="title"><a href="https://arxiv.org/abs/2504.02589">Knowledge Graph Completion with Mixed Geometry Tensor Factorization</a></div>
+            <div class="authors">Viacheslav Yusupov, Maxim Rakhuba, Evgeny Frolov</div>
+            <div class="categories">Category: Layout Generation | Subject: Machine Learning (cs.LG); Artificial Intelligence (cs.AI); Information Retrieval (cs.IR); Machine Learning (stat.ML)</div>
+            <div class="techniques">Techniques: Reinforcement Learning</div>
+            <div class="abstract"><strong>Abstract:</strong> In this paper, we propose a new geometric approach for knowledge graph completion via low rank tensor approximation. We augment a pretrained and well-established Euclidean model based on a Tucker tensor decomposition with a novel hyperbolic interaction term. This correction enables more nuanced capturing of distributional properties in data better aligned with real-world knowledge graphs. By combining two geometries together, our approach improves expressivity of the resulting model achieving new state-of-the-art link prediction accuracy with a significantly lower number of parameters compared to the previous Euclidean and hyperbolic models.</div>
+        </div>
+        
+        <div class="paper">
+            <div class="title"><a href="https://arxiv.org/abs/2504.02559">Leveraging LLM For Synchronizing Information Across Multilingual Tables</a></div>
+            <div class="authors">Siddharth Khincha, Tushar Kataria, Ankita Anand, Dan Roth, Vivek Gupta</div>
+            <div class="categories">Category: Layout Generation | Subject: Computation and Language (cs.CL)</div>
+            <div class="techniques">Techniques: Reinforcement Learning, Large Language Models</div>
+            <div class="abstract"><strong>Abstract:</strong> The vast amount of online information today poses challenges for non-English speakers, as much of it is concentrated in high-resource languages such as English and French. Wikipedia reflects this imbalance, with content in low-resource languages frequently outdated or incomplete. Recent research has sought to improve cross-language synchronization of Wikipedia tables using rule-based methods. These approaches can be effective, but they struggle with complexity and generalization. This paper explores large language models (LLMs) for multilingual information synchronization, using zero-shot prompting as a scalable solution. We introduce the Information Updation dataset, simulating the real-world process of updating outdated Wikipedia tables, and evaluate LLM performance. Our findings reveal that single-prompt approaches often produce suboptimal results, prompting us to introduce a task decomposition strategy that enhances coherence and accuracy. Our proposed method outperforms existing baselines, particularly in Information Updation (1.79%) and Information Addition (20.58%), highlighting the model strength in dynamically updating and enriching data across architectures</div>
+        </div>
+        
+        <div class="paper">
+            <div class="title"><a href="https://arxiv.org/abs/2504.02526">Improving User Experience with FAICO: Towards a Framework for AI Communication in Human-AI Co-Creativity</a></div>
+            <div class="authors">Jeba Rezwana, Corey Ford</div>
+            <div class="categories">Category: UI/UX Design, Design Tools | Subject: Human-Computer Interaction (cs.HC); Artificial Intelligence (cs.AI)</div>
+            <div class="techniques">Techniques: </div>
+            <div class="abstract"><strong>Abstract:</strong> How AI communicates with humans is crucial for effective human-AI co-creation. However, many existing co-creative AI tools cannot communicate effectively, limiting their potential as collaborators. This paper introduces our initial design of a Framework for designing AI Communication (FAICO) for co-creative AI based on a systematic review of 107 full-length papers. FAICO presents key aspects of AI communication and their impacts on user experience to guide the design of effective AI communication. We then show actionable ways to translate our framework into two practical tools: design cards for designers and a configuration tool for users. The design cards enable designers to consider AI communication strategies that cater to a diverse range of users in co-creative contexts, while the configuration tool empowers users to customize AI communication based on their needs and creative workflows. This paper contributes new insights within the literature on human-AI co-creativity and Human-Computer Interaction, focusing on designing AI communication to enhance user experience.</div>
+        </div>
+        
+        <div class="paper">
+            <div class="title"><a href="https://arxiv.org/abs/2504.02522">Charm: The Missing Piece in ViT fine-tuning for Image Aesthetic Assessment</a></div>
+            <div class="authors">Fatemeh Behrad, Tinne Tuytelaars, Johan Wagemans</div>
+            <div class="categories">Category: Layout Generation | Subject: Computer Vision and Pattern Recognition (cs.CV)</div>
+            <div class="techniques">Techniques: Transformers, Reinforcement Learning, Computer Vision</div>
+            <div class="abstract"><strong>Abstract:</strong> The capacity of Vision transformers (ViTs) to handle variable-sized inputs is often constrained by computational complexity and batch processing limitations. Consequently, ViTs are typically trained on small, fixed-size images obtained through downscaling or cropping. While reducing computational burden, these methods result in significant information loss, negatively affecting tasks like image aesthetic assessment. We introduce Charm, a novel tokenization approach that preserves Composition, High-resolution, Aspect Ratio, and Multi-scale information simultaneously. Charm prioritizes high-resolution details in specific regions while downscaling others, enabling shorter fixed-size input sequences for ViTs while incorporating essential information. Charm is designed to be compatible with pre-trained ViTs and their learned positional embeddings. By providing multiscale input and introducing variety to input tokens, Charm improves ViT performance and generalizability for image aesthetic assessment. We avoid cropping or changing the aspect ratio to further preserve information. Extensive experiments demonstrate significant performance improvements on various image aesthetic and quality assessment datasets (up to 8.1 %) using a lightweight ViT backbone. Code and pre-trained models are available at this https URL.</div>
+        </div>
+        
+        <div class="paper">
+            <div class="title"><a href="https://arxiv.org/abs/2504.02498">VISTA: Unsupervised 2D Temporal Dependency Representations for Time Series Anomaly Detection</a></div>
+            <div class="authors">Sinchee Chin, Fan Zhang, Xiaochen Yang, Jing-Hao Xue, Wenming Yang, Peng Jia, Guijin Wang, Luo Yingqun</div>
+            <div class="categories">Category: Layout Generation, UI/UX Design, 3D Design | Subject: Machine Learning (cs.LG); Information Theory (cs.IT)</div>
+            <div class="techniques">Techniques: Reinforcement Learning</div>
+            <div class="abstract"><strong>Abstract:</strong> Time Series Anomaly Detection (TSAD) is essential for uncovering rare and potentially harmful events in unlabeled time series data. Existing methods are highly dependent on clean, high-quality inputs, making them susceptible to noise and real-world imperfections. Additionally, intricate temporal relationships in time series data are often inadequately captured in traditional 1D representations, leading to suboptimal modeling of dependencies. We introduce VISTA, a training-free, unsupervised TSAD algorithm designed to overcome these challenges. VISTA features three core modules: 1) Time Series Decomposition using Seasonal and Trend Decomposition via Loess (STL) to decompose noisy time series into trend, seasonal, and residual components; 2) Temporal Self-Attention, which transforms 1D time series into 2D temporal correlation matrices for richer dependency modeling and anomaly detection; and 3) Multivariate Temporal Aggregation, which uses a pretrained feature extractor to integrate cross-variable information into a unified, memory-efficient representation. VISTA's training-free approach enables rapid deployment and easy hyperparameter tuning, making it suitable for industrial applications. It achieves state-of-the-art performance on five multivariate TSAD benchmarks.</div>
+        </div>
+        
+        <div class="paper">
+            <div class="title"><a href="https://arxiv.org/abs/2504.02467">BOOST: Bootstrapping Strategy-Driven Reasoning Programs for Program-Guided Fact-Checking</a></div>
+            <div class="authors">Qisheng Hu, Quanyu Long, Wenya Wang</div>
+            <div class="categories">Category: Layout Generation, UI/UX Design | Subject: Artificial Intelligence (cs.AI)</div>
+            <div class="techniques">Techniques: Reinforcement Learning</div>
+            <div class="abstract"><strong>Abstract:</strong> Program-guided reasoning has shown promise in complex claim fact-checking by decomposing claims into function calls and executing reasoning programs. However, prior work primarily relies on few-shot in-context learning (ICL) with ad-hoc demonstrations, which limit program diversity and require manual design with substantial domain knowledge. Fundamentally, the underlying principles of effective reasoning program generation still remain underexplored, making it challenging to construct effective demonstrations. To address this, we propose BOOST, a bootstrapping-based framework for few-shot reasoning program generation. BOOST explicitly integrates claim decomposition and information-gathering strategies as structural guidance for program generation, iteratively refining bootstrapped demonstrations in a strategy-driven and data-centric manner without human intervention. This enables a seamless transition from zero-shot to few-shot strategic program-guided learning, enhancing interpretability and effectiveness. Experimental results show that BOOST outperforms prior few-shot baselines in both zero-shot and few-shot settings for complex claim verification.</div>
+        </div>
+        
+        <div class="paper">
+            <div class="title"><a href="https://arxiv.org/abs/2504.02451">ConMo: Controllable Motion Disentanglement and Recomposition for Zero-Shot Motion Transfer</a></div>
+            <div class="authors">Jiayi Gao, Zijin Yin, Changcheng Hua, Yuxin Peng, Kongming Liang, Zhanyu Ma, Jun Guo, Yang Liu</div>
+            <div class="categories">Category: Layout Generation, UI/UX Design | Subject: Computer Vision and Pattern Recognition (cs.CV)</div>
+            <div class="techniques">Techniques: Reinforcement Learning</div>
+            <div class="abstract"><strong>Abstract:</strong> The development of Text-to-Video (T2V) generation has made motion transfer possible, enabling the control of video motion based on existing footage. However, current methods have two limitations: 1) struggle to handle multi-subjects videos, failing to transfer specific subject motion; 2) struggle to preserve the diversity and accuracy of motion as transferring to subjects with varying shapes. To overcome these, we introduce \textbf{ConMo}, a zero-shot framework that disentangle and recompose the motions of subjects and camera movements. ConMo isolates individual subject and background motion cues from complex trajectories in source videos using only subject masks, and reassembles them for target video generation. This approach enables more accurate motion control across diverse subjects and improves performance in multi-subject scenarios. Additionally, we propose soft guidance in the recomposition stage which controls the retention of original motion to adjust shape constraints, aiding subject shape adaptation and semantic transformation. Unlike previous methods, ConMo unlocks a wide range of applications, including subject size and position editing, subject removal, semantic modifications, and camera motion simulation. Extensive experiments demonstrate that ConMo significantly outperforms state-of-the-art methods in motion fidelity and semantic consistency. The code is available at this https URL.</div>
+        </div>
+        
+        <div class="paper">
+            <div class="title"><a href="https://arxiv.org/abs/2504.02436">SkyReels-A2: Compose Anything in Video Diffusion Transformers</a></div>
+            <div class="authors">Zhengcong Fei, Debang Li, Di Qiu, Jiahua Wang, Yikun Dou, Rui Wang, Jingtao Xu, Mingyuan Fan, Guibin Chen, Yang Li, Yahui Zhou</div>
+            <div class="categories">Category: Layout Generation | Subject: Computer Vision and Pattern Recognition (cs.CV)</div>
+            <div class="techniques">Techniques: Diffusion Models, Transformers</div>
+            <div class="abstract"><strong>Abstract:</strong> This paper presents SkyReels-A2, a controllable video generation framework capable of assembling arbitrary visual elements (e.g., characters, objects, backgrounds) into synthesized videos based on textual prompts while maintaining strict consistency with reference images for each element. We term this task elements-to-video (E2V), whose primary challenges lie in preserving the fidelity of each reference element, ensuring coherent composition of the scene, and achieving natural outputs. To address these, we first design a comprehensive data pipeline to construct prompt-reference-video triplets for model training. Next, we propose a novel image-text joint embedding model to inject multi-element representations into the generative process, balancing element-specific consistency with global coherence and text alignment. We also optimize the inference pipeline for both speed and output stability. Moreover, we introduce a carefully curated benchmark for systematic evaluation, i.e, A2 Bench. Experiments demonstrate that our framework can generate diverse, high-quality videos with precise element control. SkyReels-A2 is the first open-source commercial grade model for the generation of E2V, performing favorably against advanced closed-source commercial models. We anticipate SkyReels-A2 will advance creative applications such as drama and virtual e-commerce, pushing the boundaries of controllable video generation.</div>
+        </div>
+        
+        <div class="paper">
+            <div class="title"><a href="https://arxiv.org/abs/2504.02432">Robust Randomized Low-Rank Approximation with Row-Wise Outlier Detection</a></div>
+            <div class="authors">Aidan Tiruvan</div>
+            <div class="categories">Category: Layout Generation | Subject: Machine Learning (cs.LG); Numerical Analysis (math.NA)</div>
+            <div class="techniques">Techniques: Reinforcement Learning</div>
+            <div class="abstract"><strong>Abstract:</strong> Robust low-rank approximation under row-wise adversarial corruption can be achieved with a single pass, randomized procedure that detects and removes outlier rows by thresholding their projected norms. We propose a scalable, non-iterative algorithm that efficiently recovers the underlying low-rank structure in the presence of row-wise adversarial corruption. By first compressing the data with a Johnson Lindenstrauss projection, our approach preserves the geometry of clean rows while dramatically reducing dimensionality. Robust statistical techniques based on the median and median absolute deviation then enable precise identification and removal of outlier rows with abnormally high norms. The subsequent rank-k approximation achieves near-optimal error bounds with a one pass procedure that scales linearly with the number of observations. Empirical results confirm that combining random sketches with robust statistics yields efficient, accurate decompositions even in the presence of large fractions of corrupted rows.</div>
+        </div>
+        
+        <div class="paper">
+            <div class="title"><a href="https://arxiv.org/abs/2504.02361">MG-Gen: Single Image to Motion Graphics Generation with Layer Decomposition</a></div>
+            <div class="authors">Takahiro Shirakawa, Tomoyuki Suzuki, Daichi Haraguchi</div>
+            <div class="categories">Category: Layout Generation, UI/UX Design | Subject: Graphics (cs.GR); Computer Vision and Pattern Recognition (cs.CV)</div>
+            <div class="techniques">Techniques: </div>
+            <div class="abstract"><strong>Abstract:</strong> General image-to-video generation methods often produce suboptimal animations that do not meet the requirements of animated graphics, as they lack active text motion and exhibit object distortion. Also, code-based animation generation methods typically require layer-structured vector data which are often not readily available for motion graphic generation. To address these challenges, we propose a novel framework named MG-Gen that reconstructs data in vector format from a single raster image to extend the capabilities of code-based methods to enable motion graphics generation from a raster image in the framework of general image-to-video generation. MG-Gen first decomposes the input image into layer-wise elements, reconstructs them as HTML format data and then generates executable JavaScript code for the reconstructed HTML data. We experimentally confirm that \ours{} generates motion graphics while preserving text readability and input consistency. These successful results indicate that combining layer decomposition and animation code generation is an effective strategy for motion graphics generation.</div>
+        </div>
+        
+        <div class="paper">
+            <div class="title"><a href="https://arxiv.org/abs/2504.02327">LearNAT: Learning NL2SQL with AST-guided Task Decomposition for Large Language Models</a></div>
+            <div class="authors">Weibin Liao, Xin Gao, Tianyu Jia, Rihong Qiu, Yifan Zhu, Yang Lin, Xu Chu, Junfeng Zhao, Yasha Wang</div>
+            <div class="categories">Category: Layout Generation, UI/UX Design | Subject: Computation and Language (cs.CL)</div>
+            <div class="techniques">Techniques: Reinforcement Learning, Large Language Models</div>
+            <div class="abstract"><strong>Abstract:</strong> Natural Language to SQL (NL2SQL) has emerged as a critical task for enabling seamless interaction with databases. Recent advancements in Large Language Models (LLMs) have demonstrated remarkable performance in this domain. However, existing NL2SQL methods predominantly rely on closed-source LLMs leveraging prompt engineering, while open-source models typically require fine-tuning to acquire domain-specific knowledge. Despite these efforts, open-source LLMs struggle with complex NL2SQL tasks due to the indirect expression of user query objectives and the semantic gap between user queries and database schemas. Inspired by the application of reinforcement learning in mathematical problem-solving to encourage step-by-step reasoning in LLMs, we propose LearNAT (Learning NL2SQL with AST-guided Task Decomposition), a novel framework that improves the performance of open-source LLMs on complex NL2SQL tasks through task decomposition and reinforcement learning. LearNAT introduces three key components: (1) a Decomposition Synthesis Procedure that leverages Abstract Syntax Trees (ASTs) to guide efficient search and pruning strategies for task decomposition, (2) Margin-aware Reinforcement Learning, which employs fine-grained step-level optimization via DPO with AST margins, and (3) Adaptive Demonstration Reasoning, a mechanism for dynamically selecting relevant examples to enhance decomposition capabilities. Extensive experiments on two benchmark datasets, Spider and BIRD, demonstrate that LearNAT enables a 7B-parameter open-source LLM to achieve performance comparable to GPT-4, while offering improved efficiency and accessibility.</div>
+        </div>
+        
+        <div class="paper">
+            <div class="title"><a href="https://arxiv.org/abs/2504.02231">AC-LoRA: Auto Component LoRA for Personalized Artistic Style Image Generation</a></div>
+            <div class="authors">Zhipu Cui, Andong Tian, Zhi Ying, Jialiang Lu</div>
+            <div class="categories">Category: Layout Generation, Multimodal Design | Subject: Computer Vision and Pattern Recognition (cs.CV); Artificial Intelligence (cs.AI)</div>
+            <div class="techniques">Techniques: </div>
+            <div class="abstract"><strong>Abstract:</strong> Personalized image generation allows users to preserve styles or subjects of a provided small set of images for further image generation. With the advancement in large text-to-image models, many techniques have been developed to efficiently fine-tune those models for personalization, such as Low Rank Adaptation (LoRA). However, LoRA-based methods often face the challenge of adjusting the rank parameter to achieve satisfactory results. To address this challenge, AutoComponent-LoRA (AC-LoRA) is proposed, which is able to automatically separate the signal component and noise component of the LoRA matrices for fast and efficient personalized artistic style image generation. This method is based on Singular Value Decomposition (SVD) and dynamic heuristics to update the hyperparameters during training. Superior performance over existing methods in overcoming model underfitting or overfitting problems is demonstrated. The results were validated using FID, CLIP, DINO, and ImageReward, achieving an average of 9% improvement.</div>
+        </div>
+        
+        <div class="paper">
+            <div class="title"><a href="https://arxiv.org/abs/2504.02169">On the Geometry of Receiver Operating Characteristic and Precision-Recall Curves</a></div>
+            <div class="authors">Reza Sameni</div>
+            <div class="categories">Category: Layout Generation, UI/UX Design, Design Tools | Subject: Machine Learning (cs.LG); Artificial Intelligence (cs.AI); Statistics Theory (math.ST); Machine Learning (stat.ML)</div>
+            <div class="techniques">Techniques: Reinforcement Learning</div>
+            <div class="abstract"><strong>Abstract:</strong> We study the geometry of Receiver Operating Characteristic (ROC) and Precision-Recall (PR) curves in binary classification problems. The key finding is that many of the most commonly used binary classification metrics are merely functions of the composition function $G := F_p \circ F_n^{-1}$, where $F_p(\cdot)$ and $F_n(\cdot)$ are the class-conditional cumulative distribution functions of the classifier scores in the positive and negative classes, respectively. This geometric perspective facilitates the selection of operating points, understanding the effect of decision thresholds, and comparison between classifiers. It also helps explain how the shapes and geometry of ROC/PR curves reflect classifier behavior, providing objective tools for building classifiers optimized for specific applications with context-specific constraints. We further explore the conditions for classifier dominance, present analytical and numerical examples demonstrating the effects of class separability and variance on ROC and PR geometries, and derive a link between the positive-to-negative class leakage function $G(\cdot)$ and the Kullback--Leibler divergence. The framework highlights practical considerations, such as model calibration, cost-sensitive optimization, and operating point selection under real-world capacity constraints, enabling more informed approaches to classifier deployment and decision-making.</div>
+        </div>
+        
+        <div class="paper">
+            <div class="title"><a href="https://arxiv.org/abs/2504.02016">Fourier Feature Attribution: A New Efficiency Attribution Method</a></div>
+            <div class="authors">Zechen Liu, Feiyang Zhang, Wei Song, Xiang Li, Wei Wei</div>
+            <div class="categories">Category: Layout Generation, UI/UX Design | Subject: Machine Learning (cs.LG)</div>
+            <div class="techniques">Techniques: Transformers, Computer Vision</div>
+            <div class="abstract"><strong>Abstract:</strong> The study of neural networks from the perspective of Fourier features has garnered significant attention. While existing analytical research suggests that neural networks tend to learn low-frequency features, a clear attribution method for identifying the specific learned Fourier features has remained elusive. To bridge this gap, we propose a novel Fourier feature attribution method grounded in signal decomposition theory. Additionally, we analyze the differences between game-theoretic attribution metrics for Fourier and spatial domain features, demonstrating that game-theoretic evaluation metrics are better suited for Fourier-based feature attribution. Our experiments show that Fourier feature attribution exhibits superior feature selection capabilities compared to spatial domain attribution methods. For instance, in the case of Vision Transformers (ViTs) on the ImageNet dataset, only $8\%$ of the Fourier features are required to maintain the original predictions for $80\%$ of the samples. Furthermore, we compare the specificity of features identified by our method against traditional spatial domain attribution methods. Results reveal that Fourier features exhibit greater intra-class concentration and inter-class distinctiveness, indicating their potential for more efficient classification and explainable AI algorithms.</div>
+        </div>
+        
+        <div class="footer">
+            <p>Generated by Design Papers Finder</p>
+        </div>
+    </body>
+    </html>
+    

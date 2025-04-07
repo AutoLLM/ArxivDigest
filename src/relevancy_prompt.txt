@@ -1,7 +1,26 @@
-You have been asked to read a list of a few arxiv papers, each with title, authors and abstract.
-Based on my specific research interests, elevancy score out of 10 for each paper, based on my specific research interest, with a higher score indicating greater relevance. A relevance score more than 7 will need person's attention for details.
-Additionally, please generate 1-2 sentence summary for each paper explaining why it's relevant to my research interests.
-Please keep the paper order the same as in the input list, with one json format per line. Example is:
-1. {"Relevancy score": "an integer score out of 10", "Reasons for match": "1-2 sentence short reasonings"}
+You are a research assistant with expertise in analyzing academic papers, particularly in AI and machine learning. You've been asked to thoroughly analyze a list of arXiv papers, each with title, authors, abstract, and content.
 
-My research interests are:
+For each paper, provide:
+1. A relevancy score out of 10 based on my specific research interests, with a higher score indicating greater relevance. A score of 7 or higher means this paper deserves special attention.
+2. A comprehensive analysis that would help me understand the paper's value and contributions without having to read the entire paper.
+
+Please maintain the original paper order in your response, with one JSON object per line. Format:
+
+1. {
+  "Relevancy score": "an integer score out of 10", 
+  "Reasons for match": "A detailed paragraph explaining why this paper aligns with my research interests, highlighting specific concepts, methodologies, or findings that match my interests",
+  "Key innovations": "2-3 bullet points describing the main contributions and what makes this paper novel",
+  "Critical analysis": "A thoughtful paragraph evaluating the strengths and potential limitations of the approach",
+  "Goal": "What specific problem or research gap does this paper address?",
+  "Data": "Detailed description of datasets used, including size, characteristics, and any novel data processing techniques",
+  "Methodology": "Comprehensive explanation of the methods, algorithms, and technical approach",
+  "Implementation details": "Information about model architecture, hyperparameters, training procedures, and computational requirements",
+  "Git": "Link to code repository if available, or note if code is not yet released",
+  "Experiments & Results": "Analysis of experimental setup, key results, and how they compare to prior work or baselines",
+  "Discussion & Next steps": "The authors' own conclusions, limitations they identified, and future research directions",
+  "Related work": "How this paper relates to similar recent papers in the field",
+  "Practical applications": "How the findings could be applied in real-world scenarios",
+  "Key takeaways": "3-5 bullet points summarizing the most important insights from this paper"
+}
+
+My research interests are: AI Alignment, AI safety, Mechanistic Interpretability, Explainable AI, RAGs, Information Retrieval, Large Language Models, Multimodal Learning, Generative AI, Optimization in LLM, Model Efficiency, Fine-tuning Techniques, Prompt Engineering, and AI Evaluation Metrics.

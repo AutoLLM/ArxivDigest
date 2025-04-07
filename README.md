@@ -1,106 +1,205 @@
-<p align="center"><img src="./readme_images/banner.png" width=500 /></p>
+<p align="center"><img src="./readme_images/main_banner.png" width=500 /></p>
 
-**ArXiv Digest and Personalized Recommendations using Large Language Models.**
+# ArXiv Digest (Enhanced Edition)
 
-This repo aims to provide a better daily digest for newly published arXiv papers based on your own research interests and natural-language descriptions, using relevancy ratings from GPT.
+**Personalized arXiv Paper Recommendations with Multiple AI Models**
 
-You can try it out on [Hugging Face](https://huggingface.co/spaces/AutoLLM/ArxivDigest) using your own OpenAI API key.
-
-You can also create a daily subscription pipeline to email you the results.
+This repository provides an enhanced daily digest for newly published arXiv papers based on your research interests, leveraging multiple AI models including OpenAI GPT, Google Gemini, and Anthropic Claude to provide relevancy ratings, detailed analysis, and topic clustering.
 
 ## 📚 Contents
 
-- [What this repo does](#🔍-what-this-repo-does)
-  * [Examples](#some-examples)
-- [Usage](#💡-usage)
-  * [Running as a github action using SendGrid (Recommended)](#running-as-a-github-action-using-sendgrid-recommended)
-  * [Running as a github action with SMTP credentials](#running-as-a-github-action-with-smtp-credentials)
-  * [Running as a github action without emails](#running-as-a-github-action-without-emails)
-  * [Running from the command line](#running-from-the-command-line)
-  * [Running with a user interface](#running-with-a-user-interface)
-- [Roadmap](#✅-roadmap)
-- [Extending and Contributing](#💁-extending-and-contributing)
+- [Features](#-features)
+- [Quick Start](#-quick-start)
+- [What This Repo Does](#-what-this-repo-does)
+- [Model Integrations](#-model-integrations)
+- [Design Paper Discovery](#-design-paper-discovery)
+- [Output Formats](#-output-formats)
+- [Setting Up and Usage](#-setting-up-and-usage)
+  * [Configuration](#configuration)
+  * [Running the Web Interface](#running-the-web-interface)
+  * [Running via GitHub Action](#running-via-github-action)
+  * [Running from Command Line](#running-from-command-line)
+- [API Usage Notes](#-api-usage-notes)
+- [Directory Structure](#-directory-structure)
+- [Roadmap](#-roadmap)
+- [Contributing](#-contributing)
 
-## 🔍 What this repo does
+## ✨ Features
 
-Staying up to date on [arXiv](https://arxiv.org) papers can take a considerable amount of time, with on the order of hundreds of new papers each day to filter through. There is an [official daily digest service](https://info.arxiv.org/help/subscribe.html), however large categories like [cs.AI](https://arxiv.org/list/cs.AI/recent) still have 50-100 papers a day. Determining if these papers are relevant and important to you means reading through the title and abstract, which is time-consuming.
+- **Multi-Model Integration**: Support for OpenAI, Gemini, and Claude models for paper analysis
+- **Latest Models**: Support for GPT-4o, GPT-4o mini, Claude 3.5, and other current models
+- **Two-Stage Processing**: Efficient paper analysis with quick filtering followed by detailed analysis
+- **Enhanced Analysis**: Detailed paper breakdowns including key innovations, critical analysis, and practical applications
+- **HTML Report Generation**: Clean, organized reports saved with date-based filenames
+- **Adjustable Relevancy Threshold**: Interactive slider for filtering papers by relevance score
+- **Design Automation Backend**: Specialized tools for analyzing design-related papers
+- **Topic Clustering**: Group similar papers using AI-powered clustering (Gemini)
+- **Robust JSON Parsing**: Reliable extraction of analysis results from LLM responses
+- **Standardized Directory Structure**: Organized codebase with `/src`, `/data`, and `/digest` directories
+- **Improved Web UI**: Clean Gradio interface with dynamic topic selection and error handling
 
-This repository offers a method to curate a daily digest, sorted by relevance, using large language models. These models are conditioned based on your personal research interests, which are described in natural language. 
+![](./readme_images/UIarxiv.png)
 
-* You modify the configuration file `config.yaml` with an arXiv Subject, some set of Categories, and a natural language statement about the type of papers you are interested in.  
-* The code pulls all the abstracts for papers in those categories and ranks how relevant they are to your interest on a scale of 1-10 using `gpt-3.5-turbo-16k`.
-* The code then emits an HTML digest listing all the relevant papers, and optionally emails it to you using [SendGrid](https://sendgrid.com). You will need to have a SendGrid account with an API key for this functionality to work.  
+## 🚀 Quick Start
 
-### Testing it out with Hugging Face:
+Try it out on [Hugging Face](https://huggingface.co/spaces/linhkid91/ArxivDigest-extra) using your own API keys.
 
-We provide a demo at [https://huggingface.co/spaces/AutoLLM/ArxivDigest](https://huggingface.co/spaces/AutoLLM/ArxivDigest). Simply enter your [OpenAI API key](https://platform.openai.com/account/api-keys) and then fill in the configuration on the right. Note that we do not store your key.
+## 🔍 What This Repo Does
 
-![hfexample](./readme_images/hf_example.png)
+Staying up to date on [arXiv](https://arxiv.org) papers is time-consuming, with hundreds of new papers published daily. Even with the [official daily digest service](https://info.arxiv.org/help/subscribe.html), categories like [cs.AI](https://arxiv.org/list/cs.AI/recent) still contain 50-100 papers per day.
 
-You can also send yourself an email of the digest by creating a SendGrid account and [API key](https://app.SendGrid.com/settings/api_keys).
+This repository creates a personalized daily digest by:
 
-### Some examples of results:
+1. **Crawling arXiv** for recent papers in your areas of interest
+2. **Analyzing papers** in-depth using AI models (OpenAI, Gemini, or Claude)
+3. **Two-stage processing** for efficiency:
+   - Stage 1: Quick relevancy filtering using only title and abstract
+   - Stage 2: Detailed analysis of papers that meet the relevancy threshold
+4. **Scoring relevance** on a scale of 1-10 based on your research interests
+5. **Providing detailed analysis** of each paper, including:
+   - Key innovations
+   - Critical analysis
+   - Implementation details
+   - Practical applications
+   - Related work
+6. **Generating reports** in HTML format with clean organization
 
-#### Digest Configuration:
-- Subject/Topic: Computer Science
-- Categories: Artificial Intelligence, Computation and Language 
-- Interest: 
-  - Large language model pretraining and finetunings
-  - Multimodal machine learning
-  - Do not care about specific application, for example, information extraction, summarization, etc.
-  - Not interested in paper focus on specific languages, e.g., Arabic, Chinese, etc.
+## 🤖 Model Integrations
 
-#### Result:
-<p align="left"><img src="./readme_images/example_1.png" width=580 /></p>
+The system supports three major AI providers:
 
-#### Digest Configuration:
-- Subject/Topic: Quantitative Finance
-- Interest: "making lots of money"
+- **OpenAI GPT** (gpt-3.5-turbo-16k, gpt-4, gpt-4-turbo, gpt-4o, gpt-4o-mini)
+- **Google Gemini** (gemini-1.5-flash, gemini-1.5-pro, gemini-2.0-flash)
+- **Anthropic Claude** (claude-3-haiku, claude-3-sonnet, claude-3-opus, claude-3.5-sonnet)
 
-#### Result:
-<p align="left"><img src="./readme_images/example_2.png" width=580 /></p>
+You can use any combination of these models, allowing you to compare results or choose based on your needs.
 
-## 💡 Usage
+## 📊 Output Formats
 
-### Running as a github action using SendGrid (Recommended).
+Reports are generated in multiple formats:
 
-The recommended way to get started using this repository is to:
+- **HTML Reports**: Clean, organized reports saved to the `/digest` directory with date-based filenames
+- **Console Output**: Summary information displayed in the terminal
+- **JSON Data**: Raw paper data saved to the `/data` directory
 
-1. Fork the repository
-2. Modify `config.yaml` and merge the changes into your main branch.
-3. Set the following secrets [(under settings, Secrets and variables, repository secrets)](https://docs.github.com/en/actions/security-guides/encrypted-secrets#creating-encrypted-secrets-for-a-repository). See [Advanced Usage](./advanced_usage.md#create-and-fetch-your-api-keys) for more details on how to create and get OpenAi and SendGrid API keys:
-   - `OPENAI_API_KEY` From [OpenAI](https://platform.openai.com/account/api-keys)
-   - `SENDGRID_API_KEY` From [SendGrid](https://app.SendGrid.com/settings/api_keys)
-   - `FROM_EMAIL` This value must match the email you used to create the SendGrid API Key.
-   - `TO_EMAIL`
-4. Manually trigger the action or wait until the scheduled action takes place.
+Every HTML report includes:
+- Paper title, authors, and link to arXiv
+- Relevancy score with explanation
+- Abstract and key innovations
+- Critical analysis and implementation details
+- Experiments, results, and discussion points
+- Related work and practical applications
 
-See [Advanced Usage](./advanced_usage.md) for more details, including step-by-step images, further customization, and alternate usage.
+Example HTML report:
 
-### Running with a user interface
+![](/readme_images/example_report.png)
+## 💡 Setting Up and Usage
 
-To locally run the same UI as the Huggign Face space:
- 
-1. Install the requirements in `src/requirements.txt` as well as `gradio`.
-2. Run `python src/app.py` and go to the local URL. From there you will be able to preview the papers from today, as well as the generated digests.
-3. If you want to use a `.env` file for your secrets, you can copy `.env.template` to `.env` and then set the environment variables in `.env`.
-- Note: These file may be hidden by default in some operating systems due to the dot prefix.
-- The .env file is one of the files in .gitignore, so git does not track it and it will not be uploaded to the repository.
-- Do not edit the original `.env.template` with your keys or your email address, since `.template.env` is tracked by git and editing it might cause you to commit your secrets.
+### Configuration
 
-> **WARNING:** Do not edit and commit your `.env.template` with your personal keys or email address! Doing so may expose these to the world!
+Modify `config.yaml` with your preferences:
+
+```yaml
+# Main research area
+topic: "Computer Science"
+
+# Specific categories to monitor
+categories: ["Artificial Intelligence", "Computation and Language", "Machine Learning", "Information Retrieval"]
+
+# Minimum relevance score (1-10)
+threshold: 2
+
+# Your research interests in natural language
+interest: |
+  1. AI alignment and AI safety
+  2. Mechanistic interpretability and explainable AI
+  3. Large language model optimization
+  4. RAGs, Information retrieval
+  5. AI Red teaming, deception and misalignment
+```
+
+### Running the Web Interface
+
+To run locally with the simplified UI:
+
+1. Install requirements: `pip install -r requirements.txt`
+2. Run the app: `python src/app_new.py` 
+3. Open the URL displayed in your terminal
+4. Enter your API key(s) and configure your preferences
+5. Use the relevancy threshold slider to adjust paper filtering (default is 2)
+
+### Running via GitHub Action
+
+To set up automated daily digests:
+
+1. Fork this repository
+2. Update `config.yaml` with your preferences
+3. Set the following secrets in your repository settings:
+   - `OPENAI_API_KEY` (and/or `GEMINI_API_KEY` or `ANTHROPIC_API_KEY`)
+4. The GitHub Action will run on schedule or can be triggered manually
+
+### Running from Command Line
+
+For advanced users:
+
+```bash
+# Regular paper digests with simplified UI
+python src/app_new.py
+
+# Design paper finder
+./src/design/find_design_papers.sh --days 7 --analyze
+```
+
+## ⚠️ API Usage Notes
+
+This tool respects arXiv's robots.txt and implements proper rate limiting. If you encounter 403 Forbidden errors:
+
+1. Wait a few hours before trying again
+2. Consider reducing the number of categories you're fetching
+3. Increase the delay between requests in the code
+
+## 📁 Directory Structure
+
+The repository is organized as follows:
+
+- `/src` - All Python source code
+  - `app_new.py` - Simplified interface with improved threshold handling and UI
+  - `download_new_papers.py` - arXiv crawler
+  - `relevancy.py` - Paper scoring and analysis with robust JSON parsing
+  - `model_manager.py` - Multi-model integration
+  - `gemini_utils.py` - Gemini API integration
+  - `anthropic_utils.py` - Claude API integration
+  - `design/` - Design automation tools
+  - `paths.py` - Standardized path handling
+- `/data` - JSON data files (auto-created)
+- `/digest` - HTML report files (auto-created)
 
 ## ✅ Roadmap
 
-- [x] Support personalized paper recommendation using LLM.
-- [x] Send emails for daily digest.
-- [ ] Implement a ranking factor to prioritize content from specific authors.
-- [ ] Support open-source models, e.g., LLaMA, Vicuna, MPT etc.
-- [ ] Fine-tune an open-source model to better support paper ranking and stay updated with the latest research concepts..
+- [x] Support multiple AI models (OpenAI, Gemini, Claude)
+- [x] Generate comprehensive HTML reports with date-based filenames
+- [x] Specialized analysis for design automation papers
+- [x] Topic clustering via Gemini
+- [x] Standardized directory structure
+- [x] Enhanced HTML reports with detailed analysis sections
+- [x] Pre-filtering of arXiv categories for efficiency
+- [x] Adjustable relevancy threshold with UI slider
+- [x] Robust JSON parsing for reliable LLM response handling
+- [x] Simplified UI focused on core functionality
+- [x] Dynamic topic selection UI with improved error handling
+- [x] Support for newer models (GPT-4o, GPT-4o mini, Claude 3.5)
+- [x] Two-stage paper processing for efficiency (quick filtering followed by detailed analysis)
+- [x] Removed email functionality in favor of local HTML reports
+- [ ] Full PDF content analysis
+- [ ] Author-based ranking and filtering
+- [ ] Fine-tuned open-source model support: Ollama, LocalAI...
 
+## 💁 Contributing
 
-## 💁 Extending and Contributing
+You're encouraged to modify this code for your personal needs. If your modifications would be useful to others, please submit a pull request.
 
-You may (and are encourage to) modify the code in this repository to suit your personal needs. If you think your modifications would be in any way useful to others, please submit a pull request.
-
-These types of modifications include things like changes to the prompt, different language models, or additional ways for the digest is delivered to you.
+Valuable contributions include:
+- Additional AI model integrations
+- New analysis capabilities
+- UI improvements
+- Prompt engineering enhancements

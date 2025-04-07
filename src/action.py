@@ -1,8 +1,6 @@
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Email, To, Content
 
-from datetime import date
-
 import argparse
 import yaml
 import os
@@ -10,7 +8,11 @@ from dotenv import load_dotenv
 import openai
 from relevancy import generate_relevance_score, process_subject_fields
 from download_new_papers import get_papers
+from datetime import date
 
+import ssl
+
+ssl._create_default_https_context = ssl._create_stdlib_context
 
 # Hackathon quality code. Don't judge too harshly.
 # Feel free to submit pull requests to improve the code.
@@ -222,6 +224,7 @@ category_map = {
 
 
 def generate_body(topic, categories, interest, threshold):
+    f_papers = []
     if topic == "Physics":
         raise RuntimeError("You must choose a physics subtopic.")
     elif topic in physics_topics:
@@ -235,11 +238,13 @@ def generate_body(topic, categories, interest, threshold):
             if category not in category_map[topic]:
                 raise RuntimeError(f"{category} is not a category of {topic}")
         papers = get_papers(abbr)
+
         papers = [
             t
             for t in papers
             if bool(set(process_subject_fields(t["subjects"])) & set(categories))
         ]
+
     else:
         papers = get_papers(abbr)
     if interest:
@@ -247,11 +252,16 @@ def generate_body(topic, categories, interest, threshold):
             papers,
             query={"interest": interest},
             threshold_score=threshold,
-            num_paper_in_prompt=16,
+            num_paper_in_prompt=2,
         )
+
         body = "<br><br>".join(
             [
-                f'Title: <a href="{paper["main_page"]}">{paper["title"]}</a><br>Authors: {paper["authors"]}<br>Score: {paper["Relevancy score"]}<br>Reason: {paper["Reasons for match"]}'
+                f'<b>Subject: </b>{paper["subjects"]}<br><b>Title:</b> <a href="{paper["main_page"]}">{paper["title"]}</a><br><b>Authors:</b> {paper["authors"]}<br>'
+                f'<b>Score:</b> {paper["Relevancy score"]}<br><b>Reason:</b> {paper["Reasons for match"]}<br>'
+                f'<b>Goal:</b> {paper["Goal"]}<br><b>Data</b>: {paper["Data"]}<br><b>Methodology:</b> {paper["Methodology"]}<br>'
+                f'<b>Experiments & Results</b>: {paper["Experiments & Results"]}<br><b>Git</b>: {paper["Git"]}<br>'
+                f'<b>Discussion & Next steps</b>: {paper["Discussion & Next steps"]}'
                 for paper in relevancy
             ]
         )
@@ -269,6 +279,10 @@ def generate_body(topic, categories, interest, threshold):
         )
     return body
 
+def get_date():
+    today = date.today()
+    formatted_date = today.strftime("%d%m%Y")
+    return formatted_date
 
 if __name__ == "__main__":
     # Load the .env file.
@@ -292,7 +306,8 @@ if __name__ == "__main__":
     threshold = config["threshold"]
     interest = config["interest"]
     body = generate_body(topic, categories, interest, threshold)
-    with open("digest.html", "w") as f:
+    today_date = get_date()
+    with open(f"digest_{today_date}.html", "w") as f:
         f.write(body)
     if os.environ.get("SENDGRID_API_KEY", None):
         sg = SendGridAPIClient(api_key=os.environ.get("SENDGRID_API_KEY"))

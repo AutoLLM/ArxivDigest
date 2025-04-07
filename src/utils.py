@@ -6,14 +6,20 @@ import io
 import sys
 import time
 import json
-from typing import Optional, Sequence, Union
+from typing import Optional, Sequence, Union, Dict, Any
 
 import openai
 import tqdm
-from openai import openai_object
 import copy
 
-StrOrOpenAIObject = Union[str, openai_object.OpenAIObject]
+# Handle both old and new OpenAI SDK versions
+try:
+    from openai import openai_object
+    StrOrOpenAIObject = Union[str, openai_object.OpenAIObject]
+    OPENAI_OLD_API = True
+except ImportError:
+    StrOrOpenAIObject = Union[str, Dict[str, Any]]
+    OPENAI_OLD_API = False
 
 
 openai_org = os.getenv("OPENAI_ORG")
@@ -24,7 +30,8 @@ if openai_org is not None:
 
 @dataclasses.dataclass
 class OpenAIDecodingArguments(object):
-    max_tokens: int = 1800
+    #max_tokens: int = 1800
+    max_tokens: int = 5400
     temperature: float = 0.2
     top_p: float = 1.0
     n: int = 1
@@ -39,7 +46,7 @@ def openai_completion(
     prompts, #: Union[str, Sequence[str], Sequence[dict[str, str]], dict[str, str]],
     decoding_args: OpenAIDecodingArguments,
     model_name="text-davinci-003",
-    sleep_time=2,
+    sleep_time=15,
     batch_size=1,
     max_instances=sys.maxsize,
     max_batches=sys.maxsize,
@@ -96,34 +103,97 @@ def openai_completion(
     ):
         batch_decoding_args = copy.deepcopy(decoding_args)  # cloning the decoding_args
 
-        backoff = 3
+        backoff = 5
 
         while True:
             try:
+                time.sleep(3)
                 shared_kwargs = dict(
                     model=model_name,
                     **batch_decoding_args.__dict__,
                     **decoding_kwargs,
                 )
-                if is_chat_model:
-                    completion_batch = openai.ChatCompletion.create(
-                        messages=[
-                            {"role": "system", "content": "You are a helpful assistant."},
-                            {"role": "user", "content": prompt_batch[0]}
-                        ],
-                        **shared_kwargs
-                    )
+                
+                if OPENAI_OLD_API:
+                    # Use old API format
+                    if is_chat_model:
+                        completion_batch = openai.ChatCompletion.create(
+                            messages=[
+                                {"role": "system", "content": "You are a helpful assistant."},
+                                {"role": "user", "content": prompt_batch[0]}
+                            ],
+                            **shared_kwargs
+                        )
+                    else:
+                        completion_batch = openai.Completion.create(prompt=prompt_batch, **shared_kwargs)
+                    
+                    choices = completion_batch.choices
+                    
+                    for choice in choices:
+                        choice["total_tokens"] = completion_batch.usage.total_tokens
                 else:
-                    completion_batch = openai.Completion.create(prompt=prompt_batch, **shared_kwargs)
-
-                choices = completion_batch.choices
-
-                for choice in choices:
-                    choice["total_tokens"] = completion_batch.usage.total_tokens
+                    # Use new API format
+                    client = openai.OpenAI()
+                    
+                    if is_chat_model:
+                        completion_batch = client.chat.completions.create(
+                            model=model_name,
+                            messages=[
+                                {"role": "system", "content": "You are a helpful assistant."},
+                                {"role": "user", "content": prompt_batch[0]}
+                            ],
+                            temperature=batch_decoding_args.temperature,
+                            max_tokens=batch_decoding_args.max_tokens,
+                            top_p=batch_decoding_args.top_p,
+                            n=batch_decoding_args.n,
+                            stream=batch_decoding_args.stream,
+                            presence_penalty=batch_decoding_args.presence_penalty,
+                            frequency_penalty=batch_decoding_args.frequency_penalty,
+                            **decoding_kwargs
+                        )
+                        
+                        # Convert completion to dictionary format for consistency
+                        choices = []
+                        for choice in completion_batch.choices:
+                            choice_dict = {
+                                "message": {
+                                    "content": choice.message.content,
+                                    "role": choice.message.role
+                                },
+                                "index": choice.index,
+                                "finish_reason": choice.finish_reason,
+                                "total_tokens": completion_batch.usage.total_tokens
+                            }
+                            choices.append(choice_dict)
+                    else:
+                        completion_batch = client.completions.create(
+                            model=model_name,
+                            prompt=prompt_batch, 
+                            temperature=batch_decoding_args.temperature,
+                            max_tokens=batch_decoding_args.max_tokens,
+                            top_p=batch_decoding_args.top_p,
+                            n=batch_decoding_args.n,
+                            stream=batch_decoding_args.stream,
+                            presence_penalty=batch_decoding_args.presence_penalty,
+                            frequency_penalty=batch_decoding_args.frequency_penalty,
+                            **decoding_kwargs
+                        )
+                        
+                        # Convert completion to dictionary format for consistency
+                        choices = []
+                        for choice in completion_batch.choices:
+                            choice_dict = {
+                                "text": choice.text,
+                                "index": choice.index,
+                                "finish_reason": choice.finish_reason,
+                                "total_tokens": completion_batch.usage.total_tokens
+                            }
+                            choices.append(choice_dict)
+                
                 completions.extend(choices)
                 break
-            except openai.error.OpenAIError as e:
-                logging.warning(f"OpenAIError: {e}.")
+            except Exception as e:
+                logging.warning(f"OpenAI API Error: {e}.")
                 if "Please reduce your prompt" in str(e):
                     batch_decoding_args.max_tokens = int(batch_decoding_args.max_tokens * 0.8)
                     logging.warning(f"Reducing target length to {batch_decoding_args.max_tokens}, Retrying...")
@@ -134,9 +204,14 @@ def openai_completion(
                     backoff -= 1
                     logging.warning("Hit request rate limit; retrying...")
                     time.sleep(sleep_time)  # Annoying rate limit on requests.
+                    continue
 
     if return_text:
-        completions = [completion.text for completion in completions]
+        if is_chat_model:
+            completions = [completion.get("message", {}).get("content", "") for completion in completions]
+        else:
+            completions = [completion.get("text", "") for completion in completions]
+            
     if decoding_args.n > 1:
         # make completions a nested list, where each entry is a consecutive decoding_args.n of original entries.
         completions = [completions[i : i + decoding_args.n] for i in range(0, len(completions), decoding_args.n)]
