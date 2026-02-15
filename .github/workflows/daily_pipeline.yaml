@@ -3,16 +3,13 @@ name: Daily pipeline
 on:
   workflow_dispatch: {}
   schedule:
-    # 13:25 UTC, Sun–Thu
     - cron: "25 13 * * 0-4"
 
 jobs:
   generate_and_send_digest:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -45,13 +42,12 @@ jobs:
           username: ${{ secrets.SMTP_USER }}
           password: ${{ secrets.SMTP_PASS }}
 
-          # 465 通常是 SSL；587 通常是 STARTTLS（把 secure 改成 false）
+          # 465 => true；587 => false（你按实际端口改）
           secure: true
 
           subject: Personalized arXiv Digest
           to: ${{ secrets.MAIL_TO }}
           from: ${{ secrets.MAIL_FROM }}
-
           html_body: file://digest.html
           ignore_cert: true
           priority: normal
