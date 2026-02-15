@@ -17,9 +17,16 @@ categories:
   - "Programming Languages"
   - "Distributed, Parallel, and Cluster Computing"
   - "Operating Systems"
+  - "Artificial Intelligence"
+  - "Machine Learning"
+  - "Computation and Language"
+  - "Computer Vision and Pattern Recognition"
+  - "Information Retrieval"
+  - "Software Engineering"
+  - "Programming Languages"
 
 # 相关度阈值：越低命中越多（建议先 0.20，空就 0.15，太多就 0.25）
-threshold: 0.20
+threshold: 0.10
 
 # 兴趣描述：建议“分块 + 权重”，让模型更稳定
 interest: |
