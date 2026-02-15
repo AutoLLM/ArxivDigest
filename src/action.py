@@ -14,9 +14,6 @@ import yaml
 from relevancy import generate_relevance_score, process_subject_fields
 from download_new_papers import get_papers
 
-# -----------------------------
-# Topic maps (original project)
-# -----------------------------
 topics = {
     "Physics": "",
     "Mathematics": "math",
@@ -44,7 +41,6 @@ physics_topics = {
     "Quantum Physics": "quant-ph",
 }
 
-# TODO: surely theres a better way
 category_map = {
     "Astrophysics": [
         "Astrophysics of Galaxies",
@@ -222,21 +218,13 @@ category_map = {
 }
 
 
-# -----------------------------
-# Helpers
-# -----------------------------
 def _html_to_text(s: str) -> str:
-    """Convert limited HTML into readable plain text fallback."""
     s = re.sub(r"<br\s*/?>", "\n", s, flags=re.I)
     s = re.sub(r"</p\s*>", "\n\n", s, flags=re.I)
     s = re.sub(r"<li\s*>", "• ", s, flags=re.I)
     s = re.sub(r"</li\s*>", "\n", s, flags=re.I)
     s = re.sub(r"<[^>]+>", "", s)
     return html_lib.unescape(s).strip()
-
-
-def _safe_join(xs: List[str], sep: str = ", ") -> str:
-    return sep.join([x for x in xs if x])
 
 
 def _pick_topic_abbr(topic: str) -> str:
@@ -250,7 +238,6 @@ def _pick_topic_abbr(topic: str) -> str:
 
 
 def _filter_by_categories(papers: List[Dict[str, Any]], topic: str, categories: List[str]) -> List[Dict[str, Any]]:
-    """Filter papers by user-selected categories (subject fields)."""
     for category in categories:
         if category not in category_map.get(topic, []):
             raise RuntimeError(f"{category} 不是 {topic} 的有效分类（subject field）。")
@@ -260,17 +247,13 @@ def _filter_by_categories(papers: List[Dict[str, Any]], topic: str, categories: 
     ]
 
 
-def _build_cards_html(
-    papers: List[Dict[str, Any]],
-    show_score: bool,
-) -> str:
-    """Render paper list as card-style HTML."""
+def _build_cards_html(papers: List[Dict[str, Any]], show_score: bool) -> str:
     cards = []
     for idx, p in enumerate(papers, start=1):
-        title = p.get("title", "").strip()
-        url = p.get("main_page", "").strip()
-        authors = p.get("authors", "").strip()
-        subjects = p.get("subjects", "").strip()
+        title = (p.get("title") or "").strip()
+        url = (p.get("main_page") or "").strip()
+        authors = (p.get("authors") or "").strip()
+        subjects = (p.get("subjects") or "").strip()
 
         score = str(p.get("Relevancy score", "")).strip() if show_score else ""
         reason = str(p.get("Reasons for match", "")).strip() if show_score else ""
@@ -306,107 +289,7 @@ def _build_cards_html(
     return "\n".join(cards)
 
 
-def generate_digest(
-    topic: str,
-    categories: List[str],
-    interest: str,
-    threshold: float,
-) -> Tuple[str, str, bool, bool]:
-    """
-    Generate digest content.
-
-    Returns:
-      body_fragment_html: HTML fragment
-      plain_text: fallback text
-      used_interest: whether interest scoring was used
-      had_hallucination_warning: whether hallucination warning is present
-    """
-    abbr = _pick_topic_abbr(topic)
-
-    papers = get_papers(abbr)
-
-    if categories:
-        papers = _filter_by_categories(papers, topic, categories)
-
-    used_interest = bool(interest and interest.strip())
-    hallucination_warning = False
-
-    if used_interest:
-        relevancy, hallucination = generate_relevance_score(
-            papers,
-            query={"interest": interest},
-            threshold_score=threshold,
-            num_paper_in_prompt=16,
-        )
-        hallucination_warning = bool(hallucination)
-        # relevancy is already filtered by threshold
-        papers_to_show = relevancy
-    else:
-        papers_to_show = papers
-
-    if not papers_to_show:
-        tips = [
-            "今天没有论文命中你的筛选条件。",
-            "建议：",
-            "1）把 threshold 调低（例如 0.2 / 0.1），或者先留空 interest 看全量；",
-            "2）扩大 categories（或先留空 categories）；",
-            "3）确认 topic 是否正确（比如 Computer Science / Electrical Engineering and Systems Science 等）。",
-        ]
-        body_fragment = "<br>".join([html_lib.escape(x) for x in tips])
-        plain_text = "\n".join(tips)
-        return body_fragment, plain_text, used_interest, hallucination_warning
-
-    # cards
-    if used_interest:
-        header = (
-            "以下为根据你的兴趣进行相关度排序后的推荐："
-            f"（阈值 threshold={threshold}）"
-        )
-    else:
-        header = "以下为今日最新论文列表（未启用兴趣相关度排序）："
-
-    header_html = f"<p style='margin:0 0 12px 0;color:#222;'><b>{html_lib.escape(header)}</b></p>"
-
-    if hallucination_warning:
-        warn = (
-            "⚠️ 注意：模型可能对少量论文产生“幻觉匹配”。已尽力剔除，但分数/理由仍可能不完全准确。"
-        )
-        warn_html = f"<p style='margin:0 0 12px 0;color:#b45309;'><b>{html_lib.escape(warn)}</b></p>"
-    else:
-        warn_html = ""
-
-    cards_html = _build_cards_html(papers_to_show, show_score=used_interest)
-
-    body_fragment = header_html + warn_html + cards_html
-
-    # text fallback
-    lines = [header]
-    for idx, p in enumerate(papers_to_show, start=1):
-        title = p.get("title", "").strip()
-        url = p.get("main_page", "").strip()
-        authors = p.get("authors", "").strip()
-        subjects = p.get("subjects", "").strip()
-        lines.append(f"{idx}. {title}")
-        if authors:
-            lines.append(f"   作者：{authors}")
-        if subjects:
-            lines.append(f"   分类：{subjects}")
-        if url:
-            lines.append(f"   链接：{url}")
-        if used_interest:
-            score = str(p.get("Relevancy score", "")).strip()
-            reason = str(p.get("Reasons for match", "")).strip()
-            if score:
-                lines.append(f"   相关度：{score}")
-            if reason:
-                lines.append(f"   理由：{reason}")
-        lines.append("")
-    plain_text = "\n".join(lines).strip()
-    return body_fragment, plain_text, used_interest, hallucination_warning
-
-
 def wrap_full_html(subject_cn: str, subtitle_cn: str, body_fragment: str, config_snapshot: str) -> str:
-    """Wrap fragment into a complete Chinese HTML email."""
     safe_subject = html_lib.escape(subject_cn)
     safe_subtitle = html_lib.escape(subtitle_cn)
     safe_cfg = html_lib.escape(config_snapshot)
@@ -422,9 +305,7 @@ def wrap_full_html(subject_cn: str, subtitle_cn: str, body_fragment: str, config
   <div style="max-width:860px;margin:0 auto;padding:22px;">
     <div style="background:#ffffff;border:1px solid #eef0f4;border-radius:16px;padding:18px 18px;">
       <div style="font-size:22px;font-weight:800;line-height:1.25;margin:0 0 6px 0;">{safe_subject}</div>
-      <div style="color:#666;font-size:12px;line-height:1.4;margin:0 0 14px 0;">
-        {safe_subtitle}
-      </div>
+      <div style="color:#666;font-size:12px;line-height:1.4;margin:0 0 14px 0;">{safe_subtitle}</div>
 
       <div style="height:1px;background:#f0f2f6;margin:14px 0;"></div>
 
@@ -449,6 +330,105 @@ def wrap_full_html(subject_cn: str, subtitle_cn: str, body_fragment: str, config
 """
 
 
+def generate_digest(
+    topic: str,
+    categories: List[str],
+    interest: str,
+    threshold: float,
+    top_n: int,
+    fallback_on_empty: bool,
+) -> Tuple[str, str, bool, bool, bool]:
+    """
+    Returns:
+      body_fragment_html, plain_text, used_interest, hallucination_warning, used_fallback
+    """
+    abbr = _pick_topic_abbr(topic)
+    papers = get_papers(abbr)
+
+    if categories:
+        papers = _filter_by_categories(papers, topic, categories)
+
+    used_interest = bool(interest and interest.strip())
+    used_fallback = False
+    hallucination_warning = False
+
+    papers_to_show = papers
+
+    if used_interest:
+        relevancy, hallucination = generate_relevance_score(
+            papers,
+            query={"interest": interest},
+            threshold_score=threshold,
+            num_paper_in_prompt=16,
+        )
+        hallucination_warning = bool(hallucination)
+        papers_to_show = relevancy
+
+        # ✅ 兜底：如果兴趣过滤为 0，退回“最新 Top-N”
+        if fallback_on_empty and len(papers_to_show) == 0:
+            used_fallback = True
+            papers_to_show = papers[: max(1, top_n)]
+
+    # 截断 Top-N
+    papers_to_show = papers_to_show[: max(1, top_n)]
+
+    if not papers_to_show:
+        tips = [
+            "今天没有论文命中你的筛选条件。",
+            "建议：",
+            "1）把 threshold 调低（例如 0.15 / 0.10），或者先留空 interest 看全量；",
+            "2）扩大 categories（或先留空 categories）；",
+            "3）确认 topic 是否正确（例如 Computer Science / Electrical Engineering and Systems Science 等）。",
+        ]
+        body_fragment = "<br>".join([html_lib.escape(x) for x in tips])
+        plain_text = "\n".join(tips)
+        return body_fragment, plain_text, used_interest, hallucination_warning, used_fallback
+
+    # Header
+    if used_interest and not used_fallback:
+        header = f"以下为根据你的兴趣进行相关度排序后的推荐（阈值 threshold={threshold}，Top {top_n}）："
+    elif used_interest and used_fallback:
+        header = f"⚠️ 本次“兴趣匹配”无命中，已自动退回：按最新论文发送（Top {top_n}）。"
+    else:
+        header = f"以下为今日最新论文列表（未启用兴趣相关度排序，Top {top_n}）："
+
+    header_html = f"<p style='margin:0 0 12px 0;color:#222;'><b>{html_lib.escape(header)}</b></p>"
+
+    warn_html = ""
+    if hallucination_warning and used_interest and not used_fallback:
+        warn = "⚠️ 注意：模型可能对少量论文产生“幻觉匹配”。已尽力剔除，但分数/理由仍可能不完全准确。"
+        warn_html = f"<p style='margin:0 0 12px 0;color:#b45309;'><b>{html_lib.escape(warn)}</b></p>"
+
+    cards_html = _build_cards_html(papers_to_show, show_score=(used_interest and not used_fallback))
+    body_fragment = header_html + warn_html + cards_html
+
+    # Text fallback
+    lines = [header]
+    for idx, p in enumerate(papers_to_show, start=1):
+        title = (p.get("title") or "").strip()
+        url = (p.get("main_page") or "").strip()
+        authors = (p.get("authors") or "").strip()
+        subjects = (p.get("subjects") or "").strip()
+        lines.append(f"{idx}. {title}")
+        if authors:
+            lines.append(f"   作者：{authors}")
+        if subjects:
+            lines.append(f"   分类：{subjects}")
+        if url:
+            lines.append(f"   链接：{url}")
+        if used_interest and not used_fallback:
+            score = str(p.get("Relevancy score", "")).strip()
+            reason = str(p.get("Reasons for match", "")).strip()
+            if score:
+                lines.append(f"   相关度：{score}")
+            if reason:
+                lines.append(f"   理由：{reason}")
+        lines.append("")
+    plain_text = "\n".join(lines).strip()
+
+    return body_fragment, plain_text, used_interest, hallucination_warning, used_fallback
+
+
 if __name__ == "__main__":
     load_dotenv()
 
@@ -463,41 +443,45 @@ if __name__ == "__main__":
         raise RuntimeError("环境变量中未找到 OPENAI_API_KEY")
     openai.api_key = os.environ.get("OPENAI_API_KEY")
 
-    topic = config.get("topic", "")
+    topic = str(config.get("topic", "") or "")
     categories = config.get("categories", []) or []
-    threshold = float(config.get("threshold", 0))
+    threshold = float(config.get("threshold", 0.10))
     interest = str(config.get("interest", "") or "")
 
-    # Generate digest
-    body_fragment, plain_text, used_interest, _ = generate_digest(
+    # ✅ 新增可配置项（不写也有默认值）
+    top_n = int(config.get("top_n", 20))
+    fallback_on_empty = bool(config.get("fallback_on_empty", True))
+
+    body_fragment, plain_text, used_interest, _, used_fallback = generate_digest(
         topic=topic,
         categories=categories,
         interest=interest,
         threshold=threshold,
+        top_n=top_n,
+        fallback_on_empty=fallback_on_empty,
     )
 
-    # Chinese subject + subtitle
     today_cn = date.today().strftime("%Y-%m-%d")
     subject_cn = f"个性化 arXiv 日报（{today_cn}）"
-    subtitle_cn = "建议：收藏此邮件以便回看；如 HTML 被拦截请看纯文本版本。"
+    subtitle_cn = "建议：收藏此邮件以便回看；如 HTML 被邮箱拦截请看纯文本版本。"
 
-    # Config snapshot (make it helpful for tuning)
     cfg_lines = [
         f"topic: {topic}",
         f"categories: {categories}",
         f"threshold: {threshold}",
-        f"interest: {interest[:300] + ('…' if len(interest) > 300 else '')}",
+        f"top_n: {top_n}",
+        f"fallback_on_empty: {fallback_on_empty}",
         f"mode: {'interest_relevance' if used_interest else 'no_interest'}",
+        f"used_fallback: {used_fallback}",
+        f"interest: {interest[:300] + ('…' if len(interest) > 300 else '')}",
     ]
     config_snapshot = "\n".join(cfg_lines)
 
     full_html = wrap_full_html(subject_cn, subtitle_cn, body_fragment, config_snapshot)
 
-    # Ensure non-empty fallback
     if not plain_text.strip():
         plain_text = "今天没有论文命中你的筛选条件。建议降低 threshold 或扩大 topic/categories。"
 
-    # Write outputs
     with open("digest.html", "w", encoding="utf-8") as f:
         f.write(full_html)
 
