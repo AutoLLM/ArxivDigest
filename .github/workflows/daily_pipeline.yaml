@@ -3,13 +3,15 @@ name: Daily pipeline
 on:
   workflow_dispatch: {}
   schedule:
+    # 13:25 UTC, Sun–Thu
     - cron: "25 13 * * 0-4"
 
 jobs:
   generate_and_send_digest:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -27,11 +29,29 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
+      - name: Debug digest files
+        run: |
+          ls -lah
+          echo "---- digest.html ----"
+          python - << 'PY'
+          import os
+          p="digest.html"
+          q="digest.txt"
+          print("digest.html exists:", os.path.exists(p), "size:", os.path.getsize(p) if os.path.exists(p) else -1)
+          print("digest.txt  exists:", os.path.exists(q), "size:", os.path.getsize(q) if os.path.exists(q) else -1)
+          PY
+          echo "---- digest.html head ----"
+          head -n 30 digest.html || true
+          echo "---- digest.txt head ----"
+          head -n 30 digest.txt || true
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: digest-html
-          path: digest.html
+          name: digest-files
+          path: |
+            digest.html
+            digest.txt
           if-no-files-found: error
 
       - name: Send mail via SMTP
@@ -42,12 +62,16 @@ jobs:
           username: ${{ secrets.SMTP_USER }}
           password: ${{ secrets.SMTP_PASS }}
 
-          # 465 => true；587 => false（你按实际端口改）
+          # 465 => true；587 => false（按你实际端口改）
           secure: true
 
           subject: Personalized arXiv Digest
           to: ${{ secrets.MAIL_TO }}
           from: ${{ secrets.MAIL_FROM }}
+
+          # ✅ 双通道：纯文本兜底 + HTML
+          body: file://digest.txt
           html_body: file://digest.html
+
           ignore_cert: true
           priority: normal
