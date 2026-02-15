@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from datetime import date
 import argparse
+from datetime import date
 import html as html_lib
 import os
 import re
+from typing import Any, Dict, List, Tuple
+
 from dotenv import load_dotenv
 import openai
 import yaml
@@ -12,9 +14,9 @@ import yaml
 from relevancy import generate_relevance_score, process_subject_fields
 from download_new_papers import get_papers
 
-# Hackathon quality code. Don't judge too harshly.
-# Feel free to submit pull requests to improve the code.
-
+# -----------------------------
+# Topic maps (original project)
+# -----------------------------
 topics = {
     "Physics": "",
     "Mathematics": "math",
@@ -220,100 +222,227 @@ category_map = {
 }
 
 
+# -----------------------------
+# Helpers
+# -----------------------------
 def _html_to_text(s: str) -> str:
-    """Convert a small subset of HTML into readable plain text for email fallback."""
+    """Convert limited HTML into readable plain text fallback."""
     s = re.sub(r"<br\s*/?>", "\n", s, flags=re.I)
     s = re.sub(r"</p\s*>", "\n\n", s, flags=re.I)
+    s = re.sub(r"<li\s*>", "• ", s, flags=re.I)
+    s = re.sub(r"</li\s*>", "\n", s, flags=re.I)
     s = re.sub(r"<[^>]+>", "", s)
     return html_lib.unescape(s).strip()
 
 
-def generate_body(topic: str, categories: list[str] | None, interest: str | None, threshold: float) -> str:
-    """
-    Generate digest HTML body (fragment).
+def _safe_join(xs: List[str], sep: str = ", ") -> str:
+    return sep.join([x for x in xs if x])
 
-    Args:
-        topic: top-level topic name in config.yaml
-        categories: optional list of arXiv subject categories within the topic
-        interest: optional user interest text for LLM relevancy scoring
-        threshold: relevancy threshold score
+
+def _pick_topic_abbr(topic: str) -> str:
+    if topic == "Physics":
+        raise RuntimeError("你选择了 Physics 顶级主题：必须指定一个 physics 子主题（如 Astrophysics / Quantum Physics）。")
+    if topic in physics_topics:
+        return physics_topics[topic]
+    if topic in topics:
+        return topics[topic]
+    raise RuntimeError(f"无效 topic：{topic}")
+
+
+def _filter_by_categories(papers: List[Dict[str, Any]], topic: str, categories: List[str]) -> List[Dict[str, Any]]:
+    """Filter papers by user-selected categories (subject fields)."""
+    for category in categories:
+        if category not in category_map.get(topic, []):
+            raise RuntimeError(f"{category} 不是 {topic} 的有效分类（subject field）。")
+    return [
+        t for t in papers
+        if bool(set(process_subject_fields(t.get("subjects", ""))) & set(categories))
+    ]
+
+
+def _build_cards_html(
+    papers: List[Dict[str, Any]],
+    show_score: bool,
+) -> str:
+    """Render paper list as card-style HTML."""
+    cards = []
+    for idx, p in enumerate(papers, start=1):
+        title = p.get("title", "").strip()
+        url = p.get("main_page", "").strip()
+        authors = p.get("authors", "").strip()
+        subjects = p.get("subjects", "").strip()
+
+        score = str(p.get("Relevancy score", "")).strip() if show_score else ""
+        reason = str(p.get("Reasons for match", "")).strip() if show_score else ""
+
+        title_html = html_lib.escape(title) if title else "(无标题)"
+        url_html = html_lib.escape(url) if url else "#"
+        authors_html = html_lib.escape(authors) if authors else "-"
+        subjects_html = html_lib.escape(subjects) if subjects else "-"
+
+        extra = ""
+        if show_score:
+            extra = f"""
+              <div style="margin-top:10px;color:#444;font-size:13px;">
+                <div><b>相关度分数</b>：{html_lib.escape(score) if score else "-"}</div>
+                <div style="margin-top:6px;"><b>匹配理由</b>：{html_lib.escape(reason) if reason else "-"}</div>
+              </div>
+            """
+
+        cards.append(
+            f"""
+            <div style="border:1px solid #eee;border-radius:12px;padding:14px 14px;margin:0 0 12px 0;background:#fff;">
+              <div style="font-size:16px;line-height:1.4;margin-bottom:6px;">
+                <b>{idx}. </b><a href="{url_html}" style="text-decoration:none;">{title_html}</a>
+              </div>
+              <div style="color:#555;font-size:13px;line-height:1.55;">
+                <div><b>作者</b>：{authors_html}</div>
+                <div><b>分类</b>：{subjects_html}</div>
+              </div>
+              {extra}
+            </div>
+            """
+        )
+    return "\n".join(cards)
+
+
+def generate_digest(
+    topic: str,
+    categories: List[str],
+    interest: str,
+    threshold: float,
+) -> Tuple[str, str, bool, bool]:
+    """
+    Generate digest content.
 
     Returns:
-        HTML fragment string (no <html> wrapper)
+      body_fragment_html: HTML fragment
+      plain_text: fallback text
+      used_interest: whether interest scoring was used
+      had_hallucination_warning: whether hallucination warning is present
     """
-    if topic == "Physics":
-        raise RuntimeError("You must choose a physics subtopic.")
-    elif topic in physics_topics:
-        abbr = physics_topics[topic]
-    elif topic in topics:
-        abbr = topics[topic]
-    else:
-        raise RuntimeError(f"Invalid topic {topic}")
+    abbr = _pick_topic_abbr(topic)
 
     papers = get_papers(abbr)
 
     if categories:
-        for category in categories:
-            if category not in category_map[topic]:
-                raise RuntimeError(f"{category} is not a category of {topic}")
-        papers = [
-            t for t in papers
-            if bool(set(process_subject_fields(t["subjects"])) & set(categories))
-        ]
+        papers = _filter_by_categories(papers, topic, categories)
 
-    if interest:
+    used_interest = bool(interest and interest.strip())
+    hallucination_warning = False
+
+    if used_interest:
         relevancy, hallucination = generate_relevance_score(
             papers,
             query={"interest": interest},
             threshold_score=threshold,
             num_paper_in_prompt=16,
         )
-        body = "<br><br>".join(
-            [
-                (
-                    f'Title: <a href="{paper["main_page"]}">{paper["title"]}</a><br>'
-                    f'Authors: {paper["authors"]}<br>'
-                    f'Score: {paper["Relevancy score"]}<br>'
-                    f'Reason: {paper["Reasons for match"]}'
-                )
-                for paper in relevancy
-            ]
-        )
-        if hallucination:
-            body = (
-                "Warning: the model hallucinated some papers. "
-                "We have tried to remove them, but the scores may not be accurate.<br><br>"
-                + body
-            )
+        hallucination_warning = bool(hallucination)
+        # relevancy is already filtered by threshold
+        papers_to_show = relevancy
     else:
-        body = "<br><br>".join(
-            [
-                f'Title: <a href="{paper["main_page"]}">{paper["title"]}</a><br>'
-                f'Authors: {paper["authors"]}'
-                for paper in papers
-            ]
+        papers_to_show = papers
+
+    if not papers_to_show:
+        tips = [
+            "今天没有论文命中你的筛选条件。",
+            "建议：",
+            "1）把 threshold 调低（例如 0.2 / 0.1），或者先留空 interest 看全量；",
+            "2）扩大 categories（或先留空 categories）；",
+            "3）确认 topic 是否正确（比如 Computer Science / Electrical Engineering and Systems Science 等）。",
+        ]
+        body_fragment = "<br>".join([html_lib.escape(x) for x in tips])
+        plain_text = "\n".join(tips)
+        return body_fragment, plain_text, used_interest, hallucination_warning
+
+    # cards
+    if used_interest:
+        header = (
+            "以下为根据你的兴趣进行相关度排序后的推荐："
+            f"（阈值 threshold={threshold}）"
         )
+    else:
+        header = "以下为今日最新论文列表（未启用兴趣相关度排序）："
 
-    return body
+    header_html = f"<p style='margin:0 0 12px 0;color:#222;'><b>{html_lib.escape(header)}</b></p>"
+
+    if hallucination_warning:
+        warn = (
+            "⚠️ 注意：模型可能对少量论文产生“幻觉匹配”。已尽力剔除，但分数/理由仍可能不完全准确。"
+        )
+        warn_html = f"<p style='margin:0 0 12px 0;color:#b45309;'><b>{html_lib.escape(warn)}</b></p>"
+    else:
+        warn_html = ""
+
+    cards_html = _build_cards_html(papers_to_show, show_score=used_interest)
+
+    body_fragment = header_html + warn_html + cards_html
+
+    # text fallback
+    lines = [header]
+    for idx, p in enumerate(papers_to_show, start=1):
+        title = p.get("title", "").strip()
+        url = p.get("main_page", "").strip()
+        authors = p.get("authors", "").strip()
+        subjects = p.get("subjects", "").strip()
+        lines.append(f"{idx}. {title}")
+        if authors:
+            lines.append(f"   作者：{authors}")
+        if subjects:
+            lines.append(f"   分类：{subjects}")
+        if url:
+            lines.append(f"   链接：{url}")
+        if used_interest:
+            score = str(p.get("Relevancy score", "")).strip()
+            reason = str(p.get("Reasons for match", "")).strip()
+            if score:
+                lines.append(f"   相关度：{score}")
+            if reason:
+                lines.append(f"   理由：{reason}")
+        lines.append("")
+    plain_text = "\n".join(lines).strip()
+    return body_fragment, plain_text, used_interest, hallucination_warning
 
 
-def wrap_full_html(subject: str, body_fragment: str) -> str:
-    """Wrap fragment into a complete HTML email document with UTF-8 charset."""
-    safe_subject = html_lib.escape(subject)
+def wrap_full_html(subject_cn: str, subtitle_cn: str, body_fragment: str, config_snapshot: str) -> str:
+    """Wrap fragment into a complete Chinese HTML email."""
+    safe_subject = html_lib.escape(subject_cn)
+    safe_subtitle = html_lib.escape(subtitle_cn)
+    safe_cfg = html_lib.escape(config_snapshot)
+
     return f"""<!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{safe_subject}</title>
 </head>
-<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,'Noto Sans','PingFang SC','Microsoft YaHei',sans-serif;">
-  <h2 style="margin:0 0 12px 0;">{safe_subject}</h2>
-  <div style="color:#666;font-size:12px;margin-bottom:16px;">
-    Generated by GitHub Actions · If HTML is blocked, see plain text version.
-  </div>
-  <div style="line-height:1.6;font-size:14px;">
-    {body_fragment}
+<body style="margin:0;background:#f6f7fb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,'Noto Sans','PingFang SC','Microsoft YaHei',sans-serif;">
+  <div style="max-width:860px;margin:0 auto;padding:22px;">
+    <div style="background:#ffffff;border:1px solid #eef0f4;border-radius:16px;padding:18px 18px;">
+      <div style="font-size:22px;font-weight:800;line-height:1.25;margin:0 0 6px 0;">{safe_subject}</div>
+      <div style="color:#666;font-size:12px;line-height:1.4;margin:0 0 14px 0;">
+        {safe_subtitle}
+      </div>
+
+      <div style="height:1px;background:#f0f2f6;margin:14px 0;"></div>
+
+      <div style="font-size:14px;line-height:1.7;color:#111;">
+        {body_fragment}
+      </div>
+
+      <div style="height:1px;background:#f0f2f6;margin:16px 0;"></div>
+
+      <details style="color:#555;font-size:12px;line-height:1.6;">
+        <summary style="cursor:pointer;user-select:none;">查看本次运行的配置（config.yaml 摘要）</summary>
+        <pre style="white-space:pre-wrap;background:#fafafa;border:1px solid #f0f0f0;border-radius:12px;padding:12px;margin-top:10px;">{safe_cfg}</pre>
+      </details>
+
+      <div style="color:#999;font-size:11px;margin-top:14px;">
+        由 GitHub Actions 自动生成与发送（SMTP）。如 HTML 被邮箱拦截，请查看纯文本正文。
+      </div>
+    </div>
   </div>
 </body>
 </html>
@@ -328,38 +457,52 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     with open(args.config, "r", encoding="utf-8") as f:
-        config = yaml.safe_load(f)
+        config: Dict[str, Any] = yaml.safe_load(f)
 
     if "OPENAI_API_KEY" not in os.environ:
-        raise RuntimeError("No OPENAI_API_KEY found in environment")
+        raise RuntimeError("环境变量中未找到 OPENAI_API_KEY")
     openai.api_key = os.environ.get("OPENAI_API_KEY")
 
-    topic = config["topic"]
-    categories = config.get("categories", [])
-    threshold = config.get("threshold", 0)
-    interest = config.get("interest", "")
+    topic = config.get("topic", "")
+    categories = config.get("categories", []) or []
+    threshold = float(config.get("threshold", 0))
+    interest = str(config.get("interest", "") or "")
 
-    # generate fragment
-    body_fragment = generate_body(topic, categories, interest, threshold).strip()
+    # Generate digest
+    body_fragment, plain_text, used_interest, _ = generate_digest(
+        topic=topic,
+        categories=categories,
+        interest=interest,
+        threshold=threshold,
+    )
 
-    # prevent empty email
-    if not body_fragment:
-        body_fragment = (
-            "No papers matched your filters today.<br>"
-            "Try lowering the threshold or widening categories/subject fields.<br>"
-        )
+    # Chinese subject + subtitle
+    today_cn = date.today().strftime("%Y-%m-%d")
+    subject_cn = f"个性化 arXiv 日报（{today_cn}）"
+    subtitle_cn = "建议：收藏此邮件以便回看；如 HTML 被拦截请看纯文本版本。"
 
-    subject = date.today().strftime("Personalized arXiv Digest, %d %b %Y")
+    # Config snapshot (make it helpful for tuning)
+    cfg_lines = [
+        f"topic: {topic}",
+        f"categories: {categories}",
+        f"threshold: {threshold}",
+        f"interest: {interest[:300] + ('…' if len(interest) > 300 else '')}",
+        f"mode: {'interest_relevance' if used_interest else 'no_interest'}",
+    ]
+    config_snapshot = "\n".join(cfg_lines)
 
-    # full html + plain text fallback
-    full_html = wrap_full_html(subject, body_fragment)
-    plain_text = _html_to_text(body_fragment) or "No papers matched your filters today."
+    full_html = wrap_full_html(subject_cn, subtitle_cn, body_fragment, config_snapshot)
 
+    # Ensure non-empty fallback
+    if not plain_text.strip():
+        plain_text = "今天没有论文命中你的筛选条件。建议降低 threshold 或扩大 topic/categories。"
+
+    # Write outputs
     with open("digest.html", "w", encoding="utf-8") as f:
         f.write(full_html)
 
     with open("digest.txt", "w", encoding="utf-8") as f:
-        f.write(f"{subject}\n\n{plain_text}\n")
+        f.write(f"{subject_cn}\n\n{plain_text}\n\n---\n{config_snapshot}\n")
 
-    print(f"[OK] Generated digest.html ({len(full_html)} chars) and digest.txt ({len(plain_text)} chars)")
-    print("[INFO] Email sending is handled by GitHub Actions (SMTP).")
+    print(f"[OK] 生成完成：digest.html（{len(full_html)} chars），digest.txt（{len(plain_text)} chars）")
+    print("[INFO] 邮件发送由 GitHub Actions（SMTP）负责。")
