@@ -1,27 +1,57 @@
-# For physics topics, use the specific subtopics, e.g. "Astrophysics"
+# === arXiv Digest config (multi-focus) ===
+# 主域建议用 Computer Science：覆盖 CV/CL/AI/LG/SE/IR 等
 topic: "Computer Science"
-# An empty list here will include all categories in a topic
-# Use the natural language names of the topics, found here: https://arxiv.org
-# Including more categories will result in more calls to the large language model
-categories: ["Artificial Intelligence", "Computation and Language"]
 
-# Relevance score threshold. abstracts that receive a score less than this from the large language model
-# will have their papers filtered out.
-#
-# Must be within 1-10
-threshold: 7
+# 这些是该项目内置的 “Computer Science” 可选分类（subject fields）
+# 你要的方向对应：
+# - 多模态/视觉语言：Computer Vision and Pattern Recognition / Computation and Language / Artificial Intelligence
+# - LLM/训练推理：Machine Learning / Artificial Intelligence / Computation and Language
+# - 工程/前端/Node：Software Engineering / Programming Languages / Information Retrieval / Systems and Control(偏系统)
+categories:
+  - "Computer Vision and Pattern Recognition"
+  - "Computation and Language"
+  - "Artificial Intelligence"
+  - "Machine Learning"
+  - "Information Retrieval"
+  - "Software Engineering"
+  - "Programming Languages"
+  - "Distributed, Parallel, and Cluster Computing"
+  - "Operating Systems"
+  - "Artificial Intelligence"
+  - "Machine Learning"
+  - "Computation and Language"
+  - "Computer Vision and Pattern Recognition"
+  - "Information Retrieval"
+  - "Software Engineering"
+  - "Programming Languages"
 
-# A natural language statement that the large language model will use to judge which papers are relevant 
-#
-# For example:
-#     "I am interested in complexity theory papers that establish upper bounds"
-#     "gas chromatography, mass spectrometry"
-#     "making lots of money"
-#
-# This can be empty, which just return a full list of papers with no judgement or filtering,
-# in whatever order arXiv responds with.
+# 相关度阈值：越低命中越多（建议先 0.20，空就 0.15，太多就 0.25）
+threshold: 0.10
+
+# 兴趣描述：建议“分块 + 权重”，让模型更稳定
 interest: |
-  1. Large language model pretraining and finetunings
-  2. Multimodal machine learning
-  3. Do not care about specific application, for example, information extraction, summarization, etc.
-  4. Not interested in paper focus on specific languages, e.g., Arabic, Chinese, etc.
+  我关注的方向分为四块（按优先级）：
+
+  A) 多模态 / 视觉语言 / 生成式模型（最高优先）
+  - Vision-Language Model (VLM), multimodal LLM, vision instruction tuning, grounding, retrieval-augmented generation (RAG) for vision
+  - CLIP/BLIP/LLaVA/Qwen-VL, image-text alignment, OCR + VLM, tool-use agents, long-context multimodal
+  - Efficient inference/serving for multimodal models, deployment, quantization, distillation, on-device inference
+
+  B) 大模型 / LLM 工程与训练（高优先）
+  - LLM training & alignment: SFT, DPO/IPO, RLHF/RLAIF, preference optimization
+  - MoE, KV-cache, speculative decoding, vLLM/LightLLM/TensorRT-LLM, torch.compile, FlashAttention
+  - evaluation, safety, hallucination reduction, tool calling, function calling, structured output
+
+  C) 视觉方向：红外小目标检测 / 分割（中高优先）
+  - infrared small target detection (IRSTD/SIRST), low-SNR tiny objects, segmentation-based detection
+  - multi-scale feature fusion, attention, transformer backbones (ViT/Swin/DETR), prompt-based (SAM/CLIP-assisted)
+  - datasets: IRSTD-1K / SIRST3 / NUDT-SIRST / NUAA-SIRST; metrics: Pd/Fa, IoU/F1
+
+  D) 前端 / Node / 工程体系（中优先，但要“可落地”）
+  - Front-end engineering: TypeScript, Vue/React, build tooling (Vite), performance optimization, SSR/CSR, micro-frontend
+  - Node.js backend: NestJS, TypeORM, Redis, message queues, WebSocket, observability, CI/CD
+  - Practical engineering case studies, large-scale production systems, performance & reliability
+
+  额外偏好（加分）：
+  - 与腾讯相关：多模态、AIGC、推荐/检索、工程化、性能优化、真实业务场景落地（工业界实践/开源落地）
+  - 论文有公开代码/可复现脚本/清晰评测优先；纯概念水文降权

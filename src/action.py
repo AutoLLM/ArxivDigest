@@ -1,19 +1,18 @@
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Email, To, Content
-
-from datetime import date
+from __future__ import annotations
 
 import argparse
-import yaml
+from datetime import date
+import html as html_lib
 import os
+import re
+from typing import Any, Dict, List, Tuple
+
 from dotenv import load_dotenv
 import openai
+import yaml
+
 from relevancy import generate_relevance_score, process_subject_fields
 from download_new_papers import get_papers
-
-
-# Hackathon quality code. Don't judge too harshly.
-# Feel free to submit pull requests to improve the code.
 
 topics = {
     "Physics": "",
@@ -42,8 +41,6 @@ physics_topics = {
     "Quantum Physics": "quant-ph",
 }
 
-
-# TODO: surely theres a better way
 category_map = {
     "Astrophysics": [
         "Astrophysics of Galaxies",
@@ -221,93 +218,275 @@ category_map = {
 }
 
 
-def generate_body(topic, categories, interest, threshold):
+def _html_to_text(s: str) -> str:
+    s = re.sub(r"<br\s*/?>", "\n", s, flags=re.I)
+    s = re.sub(r"</p\s*>", "\n\n", s, flags=re.I)
+    s = re.sub(r"<li\s*>", "• ", s, flags=re.I)
+    s = re.sub(r"</li\s*>", "\n", s, flags=re.I)
+    s = re.sub(r"<[^>]+>", "", s)
+    return html_lib.unescape(s).strip()
+
+
+def _pick_topic_abbr(topic: str) -> str:
     if topic == "Physics":
-        raise RuntimeError("You must choose a physics subtopic.")
-    elif topic in physics_topics:
-        abbr = physics_topics[topic]
-    elif topic in topics:
-        abbr = topics[topic]
-    else:
-        raise RuntimeError(f"Invalid topic {topic}")
+        raise RuntimeError("你选择了 Physics 顶级主题：必须指定一个 physics 子主题（如 Astrophysics / Quantum Physics）。")
+    if topic in physics_topics:
+        return physics_topics[topic]
+    if topic in topics:
+        return topics[topic]
+    raise RuntimeError(f"无效 topic：{topic}")
+
+
+def _filter_by_categories(papers: List[Dict[str, Any]], topic: str, categories: List[str]) -> List[Dict[str, Any]]:
+    for category in categories:
+        if category not in category_map.get(topic, []):
+            raise RuntimeError(f"{category} 不是 {topic} 的有效分类（subject field）。")
+    return [
+        t for t in papers
+        if bool(set(process_subject_fields(t.get("subjects", ""))) & set(categories))
+    ]
+
+
+def _build_cards_html(papers: List[Dict[str, Any]], show_score: bool) -> str:
+    cards = []
+    for idx, p in enumerate(papers, start=1):
+        title = (p.get("title") or "").strip()
+        url = (p.get("main_page") or "").strip()
+        authors = (p.get("authors") or "").strip()
+        subjects = (p.get("subjects") or "").strip()
+
+        score = str(p.get("Relevancy score", "")).strip() if show_score else ""
+        reason = str(p.get("Reasons for match", "")).strip() if show_score else ""
+
+        title_html = html_lib.escape(title) if title else "(无标题)"
+        url_html = html_lib.escape(url) if url else "#"
+        authors_html = html_lib.escape(authors) if authors else "-"
+        subjects_html = html_lib.escape(subjects) if subjects else "-"
+
+        extra = ""
+        if show_score:
+            extra = f"""
+              <div style="margin-top:10px;color:#444;font-size:13px;">
+                <div><b>相关度分数</b>：{html_lib.escape(score) if score else "-"}</div>
+                <div style="margin-top:6px;"><b>匹配理由</b>：{html_lib.escape(reason) if reason else "-"}</div>
+              </div>
+            """
+
+        cards.append(
+            f"""
+            <div style="border:1px solid #eee;border-radius:12px;padding:14px 14px;margin:0 0 12px 0;background:#fff;">
+              <div style="font-size:16px;line-height:1.4;margin-bottom:6px;">
+                <b>{idx}. </b><a href="{url_html}" style="text-decoration:none;">{title_html}</a>
+              </div>
+              <div style="color:#555;font-size:13px;line-height:1.55;">
+                <div><b>作者</b>：{authors_html}</div>
+                <div><b>分类</b>：{subjects_html}</div>
+              </div>
+              {extra}
+            </div>
+            """
+        )
+    return "\n".join(cards)
+
+
+def wrap_full_html(subject_cn: str, subtitle_cn: str, body_fragment: str, config_snapshot: str) -> str:
+    safe_subject = html_lib.escape(subject_cn)
+    safe_subtitle = html_lib.escape(subtitle_cn)
+    safe_cfg = html_lib.escape(config_snapshot)
+
+    return f"""<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{safe_subject}</title>
+</head>
+<body style="margin:0;background:#f6f7fb;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,'Noto Sans','PingFang SC','Microsoft YaHei',sans-serif;">
+  <div style="max-width:860px;margin:0 auto;padding:22px;">
+    <div style="background:#ffffff;border:1px solid #eef0f4;border-radius:16px;padding:18px 18px;">
+      <div style="font-size:22px;font-weight:800;line-height:1.25;margin:0 0 6px 0;">{safe_subject}</div>
+      <div style="color:#666;font-size:12px;line-height:1.4;margin:0 0 14px 0;">{safe_subtitle}</div>
+
+      <div style="height:1px;background:#f0f2f6;margin:14px 0;"></div>
+
+      <div style="font-size:14px;line-height:1.7;color:#111;">
+        {body_fragment}
+      </div>
+
+      <div style="height:1px;background:#f0f2f6;margin:16px 0;"></div>
+
+      <details style="color:#555;font-size:12px;line-height:1.6;">
+        <summary style="cursor:pointer;user-select:none;">查看本次运行的配置（config.yaml 摘要）</summary>
+        <pre style="white-space:pre-wrap;background:#fafafa;border:1px solid #f0f0f0;border-radius:12px;padding:12px;margin-top:10px;">{safe_cfg}</pre>
+      </details>
+
+      <div style="color:#999;font-size:11px;margin-top:14px;">
+        由 GitHub Actions 自动生成与发送（SMTP）。如 HTML 被邮箱拦截，请查看纯文本正文。
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+"""
+
+
+def generate_digest(
+    topic: str,
+    categories: List[str],
+    interest: str,
+    threshold: float,
+    top_n: int,
+    fallback_on_empty: bool,
+) -> Tuple[str, str, bool, bool, bool]:
+    """
+    Returns:
+      body_fragment_html, plain_text, used_interest, hallucination_warning, used_fallback
+    """
+    abbr = _pick_topic_abbr(topic)
+    papers = get_papers(abbr)
+
     if categories:
-        for category in categories:
-            if category not in category_map[topic]:
-                raise RuntimeError(f"{category} is not a category of {topic}")
-        papers = get_papers(abbr)
-        papers = [
-            t
-            for t in papers
-            if bool(set(process_subject_fields(t["subjects"])) & set(categories))
-        ]
-    else:
-        papers = get_papers(abbr)
-    if interest:
+        papers = _filter_by_categories(papers, topic, categories)
+
+    used_interest = bool(interest and interest.strip())
+    used_fallback = False
+    hallucination_warning = False
+
+    papers_to_show = papers
+
+    if used_interest:
         relevancy, hallucination = generate_relevance_score(
             papers,
             query={"interest": interest},
             threshold_score=threshold,
             num_paper_in_prompt=16,
         )
-        body = "<br><br>".join(
-            [
-                f'Title: <a href="{paper["main_page"]}">{paper["title"]}</a><br>Authors: {paper["authors"]}<br>Score: {paper["Relevancy score"]}<br>Reason: {paper["Reasons for match"]}'
-                for paper in relevancy
-            ]
-        )
-        if hallucination:
-            body = (
-                "Warning: the model hallucinated some papers. We have tried to remove them, but the scores may not be accurate.<br><br>"
-                + body
-            )
+        hallucination_warning = bool(hallucination)
+        papers_to_show = relevancy
+
+        # ✅ 兜底：如果兴趣过滤为 0，退回“最新 Top-N”
+        if fallback_on_empty and len(papers_to_show) == 0:
+            used_fallback = True
+            papers_to_show = papers[: max(1, top_n)]
+
+    # 截断 Top-N
+    papers_to_show = papers_to_show[: max(1, top_n)]
+
+    if not papers_to_show:
+        tips = [
+            "今天没有论文命中你的筛选条件。",
+            "建议：",
+            "1）把 threshold 调低（例如 0.15 / 0.10），或者先留空 interest 看全量；",
+            "2）扩大 categories（或先留空 categories）；",
+            "3）确认 topic 是否正确（例如 Computer Science / Electrical Engineering and Systems Science 等）。",
+        ]
+        body_fragment = "<br>".join([html_lib.escape(x) for x in tips])
+        plain_text = "\n".join(tips)
+        return body_fragment, plain_text, used_interest, hallucination_warning, used_fallback
+
+    # Header
+    if used_interest and not used_fallback:
+        header = f"以下为根据你的兴趣进行相关度排序后的推荐（阈值 threshold={threshold}，Top {top_n}）："
+    elif used_interest and used_fallback:
+        header = f"⚠️ 本次“兴趣匹配”无命中，已自动退回：按最新论文发送（Top {top_n}）。"
     else:
-        body = "<br><br>".join(
-            [
-                f'Title: <a href="{paper["main_page"]}">{paper["title"]}</a><br>Authors: {paper["authors"]}'
-                for paper in papers
-            ]
-        )
-    return body
+        header = f"以下为今日最新论文列表（未启用兴趣相关度排序，Top {top_n}）："
+
+    header_html = f"<p style='margin:0 0 12px 0;color:#222;'><b>{html_lib.escape(header)}</b></p>"
+
+    warn_html = ""
+    if hallucination_warning and used_interest and not used_fallback:
+        warn = "⚠️ 注意：模型可能对少量论文产生“幻觉匹配”。已尽力剔除，但分数/理由仍可能不完全准确。"
+        warn_html = f"<p style='margin:0 0 12px 0;color:#b45309;'><b>{html_lib.escape(warn)}</b></p>"
+
+    cards_html = _build_cards_html(papers_to_show, show_score=(used_interest and not used_fallback))
+    body_fragment = header_html + warn_html + cards_html
+
+    # Text fallback
+    lines = [header]
+    for idx, p in enumerate(papers_to_show, start=1):
+        title = (p.get("title") or "").strip()
+        url = (p.get("main_page") or "").strip()
+        authors = (p.get("authors") or "").strip()
+        subjects = (p.get("subjects") or "").strip()
+        lines.append(f"{idx}. {title}")
+        if authors:
+            lines.append(f"   作者：{authors}")
+        if subjects:
+            lines.append(f"   分类：{subjects}")
+        if url:
+            lines.append(f"   链接：{url}")
+        if used_interest and not used_fallback:
+            score = str(p.get("Relevancy score", "")).strip()
+            reason = str(p.get("Reasons for match", "")).strip()
+            if score:
+                lines.append(f"   相关度：{score}")
+            if reason:
+                lines.append(f"   理由：{reason}")
+        lines.append("")
+    plain_text = "\n".join(lines).strip()
+
+    return body_fragment, plain_text, used_interest, hallucination_warning, used_fallback
 
 
 if __name__ == "__main__":
-    # Load the .env file.
     load_dotenv()
+
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--config", help="yaml config file to use", default="config.yaml"
-    )
+    parser.add_argument("--config", help="yaml config file to use", default="config.yaml")
     args = parser.parse_args()
-    with open(args.config, "r") as f:
-        config = yaml.safe_load(f)
+
+    with open(args.config, "r", encoding="utf-8") as f:
+        config: Dict[str, Any] = yaml.safe_load(f)
 
     if "OPENAI_API_KEY" not in os.environ:
-        raise RuntimeError("No openai api key found")
+        raise RuntimeError("环境变量中未找到 OPENAI_API_KEY")
     openai.api_key = os.environ.get("OPENAI_API_KEY")
 
-    topic = config["topic"]
-    categories = config["categories"]
-    from_email = os.environ.get("FROM_EMAIL")
-    to_email = os.environ.get("TO_EMAIL")
-    threshold = config["threshold"]
-    interest = config["interest"]
-    body = generate_body(topic, categories, interest, threshold)
-    with open("digest.html", "w") as f:
-        f.write(body)
-    if os.environ.get("SENDGRID_API_KEY", None):
-        sg = SendGridAPIClient(api_key=os.environ.get("SENDGRID_API_KEY"))
-        from_email = Email(from_email)  # Change to your verified sender
-        to_email = To(to_email)
-        subject = date.today().strftime("Personalized arXiv Digest, %d %b %Y")
-        content = Content("text/html", body)
-        mail = Mail(from_email, to_email, subject, content)
-        mail_json = mail.get()
+    topic = str(config.get("topic", "") or "")
+    categories = config.get("categories", []) or []
+    threshold = float(config.get("threshold", 0.10))
+    interest = str(config.get("interest", "") or "")
 
-        # Send an HTTP POST request to /mail/send
-        response = sg.client.mail.send.post(request_body=mail_json)
-        if response.status_code >= 200 and response.status_code <= 300:
-            print("Send test email: Success!")
-        else:
-            print("Send test email: Failure ({response.status_code}, {response.text})")
-    else:
-        print("No sendgrid api key found. Skipping email")
+    # ✅ 新增可配置项（不写也有默认值）
+    top_n = int(config.get("top_n", 20))
+    fallback_on_empty = bool(config.get("fallback_on_empty", True))
+
+    body_fragment, plain_text, used_interest, _, used_fallback = generate_digest(
+        topic=topic,
+        categories=categories,
+        interest=interest,
+        threshold=threshold,
+        top_n=top_n,
+        fallback_on_empty=fallback_on_empty,
+    )
+
+    today_cn = date.today().strftime("%Y-%m-%d")
+    subject_cn = f"个性化 arXiv 日报（{today_cn}）"
+    subtitle_cn = "建议：收藏此邮件以便回看；如 HTML 被邮箱拦截请看纯文本版本。"
+
+    cfg_lines = [
+        f"topic: {topic}",
+        f"categories: {categories}",
+        f"threshold: {threshold}",
+        f"top_n: {top_n}",
+        f"fallback_on_empty: {fallback_on_empty}",
+        f"mode: {'interest_relevance' if used_interest else 'no_interest'}",
+        f"used_fallback: {used_fallback}",
+        f"interest: {interest[:300] + ('…' if len(interest) > 300 else '')}",
+    ]
+    config_snapshot = "\n".join(cfg_lines)
+
+    full_html = wrap_full_html(subject_cn, subtitle_cn, body_fragment, config_snapshot)
+
+    if not plain_text.strip():
+        plain_text = "今天没有论文命中你的筛选条件。建议降低 threshold 或扩大 topic/categories。"
+
+    with open("digest.html", "w", encoding="utf-8") as f:
+        f.write(full_html)
+
+    with open("digest.txt", "w", encoding="utf-8") as f:
+        f.write(f"{subject_cn}\n\n{plain_text}\n\n---\n{config_snapshot}\n")
+
+    print(f"[OK] 生成完成：digest.html（{len(full_html)} chars），digest.txt（{len(plain_text)} chars）")
+    print("[INFO] 邮件发送由 GitHub Actions（SMTP）负责。")
