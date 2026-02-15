@@ -1,19 +1,13 @@
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail, Email, To, Content
-
 from datetime import date
-
 import argparse
 import yaml
 import os
 from dotenv import load_dotenv
 import openai
+
 from relevancy import generate_relevance_score, process_subject_fields
 from download_new_papers import get_papers
 
-
-# Hackathon quality code. Don't judge too harshly.
-# Feel free to submit pull requests to improve the code.
 
 topics = {
     "Physics": "",
@@ -41,7 +35,6 @@ physics_topics = {
     "Physics": "physics",
     "Quantum Physics": "quant-ph",
 }
-
 
 # TODO: surely theres a better way
 category_map = {
@@ -222,6 +215,18 @@ category_map = {
 
 
 def generate_body(topic, categories, interest, threshold):
+    """
+    Generate HTML body for the digest.
+
+    Args:
+      topic: top-level topic name in config.yaml
+      categories: optional list of arXiv subject categories within the topic
+      interest: optional user interest text for LLM relevancy scoring
+      threshold: relevancy threshold score
+
+    Returns:
+      HTML string
+    """
     if topic == "Physics":
         raise RuntimeError("You must choose a physics subtopic.")
     elif topic in physics_topics:
@@ -230,18 +235,19 @@ def generate_body(topic, categories, interest, threshold):
         abbr = topics[topic]
     else:
         raise RuntimeError(f"Invalid topic {topic}")
+
+    papers = get_papers(abbr)
+
     if categories:
         for category in categories:
             if category not in category_map[topic]:
                 raise RuntimeError(f"{category} is not a category of {topic}")
-        papers = get_papers(abbr)
         papers = [
             t
             for t in papers
             if bool(set(process_subject_fields(t["subjects"])) & set(categories))
         ]
-    else:
-        papers = get_papers(abbr)
+
     if interest:
         relevancy, hallucination = generate_relevance_score(
             papers,
@@ -251,19 +257,26 @@ def generate_body(topic, categories, interest, threshold):
         )
         body = "<br><br>".join(
             [
-                f'Title: <a href="{paper["main_page"]}">{paper["title"]}</a><br>Authors: {paper["authors"]}<br>Score: {paper["Relevancy score"]}<br>Reason: {paper["Reasons for match"]}'
+                (
+                    f'Title: <a href="{paper["main_page"]}">{paper["title"]}</a><br>'
+                    f'Authors: {paper["authors"]}<br>'
+                    f'Score: {paper["Relevancy score"]}<br>'
+                    f'Reason: {paper["Reasons for match"]}'
+                )
                 for paper in relevancy
             ]
         )
         if hallucination:
             body = (
-                "Warning: the model hallucinated some papers. We have tried to remove them, but the scores may not be accurate.<br><br>"
+                "Warning: the model hallucinated some papers. "
+                "We have tried to remove them, but the scores may not be accurate.<br><br>"
                 + body
             )
     else:
         body = "<br><br>".join(
             [
-                f'Title: <a href="{paper["main_page"]}">{paper["title"]}</a><br>Authors: {paper["authors"]}'
+                f'Title: <a href="{paper["main_page"]}">{paper["title"]}</a><br>'
+                f'Authors: {paper["authors"]}'
                 for paper in papers
             ]
         )
@@ -271,43 +284,30 @@ def generate_body(topic, categories, interest, threshold):
 
 
 if __name__ == "__main__":
-    # Load the .env file.
     load_dotenv()
+
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--config", help="yaml config file to use", default="config.yaml"
-    )
+    parser.add_argument("--config", help="yaml config file to use", default="config.yaml")
     args = parser.parse_args()
+
     with open(args.config, "r") as f:
         config = yaml.safe_load(f)
 
     if "OPENAI_API_KEY" not in os.environ:
-        raise RuntimeError("No openai api key found")
+        raise RuntimeError("No OPENAI_API_KEY found in environment")
+
     openai.api_key = os.environ.get("OPENAI_API_KEY")
 
     topic = config["topic"]
-    categories = config["categories"]
-    from_email = os.environ.get("FROM_EMAIL")
-    to_email = os.environ.get("TO_EMAIL")
-    threshold = config["threshold"]
-    interest = config["interest"]
-    body = generate_body(topic, categories, interest, threshold)
-    with open("digest.html", "w") as f:
-        f.write(body)
-    if os.environ.get("SENDGRID_API_KEY", None):
-        sg = SendGridAPIClient(api_key=os.environ.get("SENDGRID_API_KEY"))
-        from_email = Email(from_email)  # Change to your verified sender
-        to_email = To(to_email)
-        subject = date.today().strftime("Personalized arXiv Digest, %d %b %Y")
-        content = Content("text/html", body)
-        mail = Mail(from_email, to_email, subject, content)
-        mail_json = mail.get()
+    categories = config.get("categories", [])
+    threshold = config.get("threshold", 0)
+    interest = config.get("interest", "")
 
-        # Send an HTTP POST request to /mail/send
-        response = sg.client.mail.send.post(request_body=mail_json)
-        if response.status_code >= 200 and response.status_code <= 300:
-            print("Send test email: Success!")
-        else:
-            print("Send test email: Failure ({response.status_code}, {response.text})")
-    else:
-        print("No sendgrid api key found. Skipping email")
+    body = generate_body(topic, categories, interest, threshold)
+
+    with open("digest.html", "w", encoding="utf-8") as f:
+        f.write(body)
+
+    subject = date.today().strftime("Personalized arXiv Digest, %d %b %Y")
+    print(f"[OK] digest.html generated. Subject: {subject}")
+    print("[INFO] Email sending is handled by GitHub Actions (SMTP).")
